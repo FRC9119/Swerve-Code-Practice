@@ -1,3 +1,15 @@
+/*
+ * 
+ * Devin Masic
+ * North Side High School
+ * Iron Legends
+ * FRC 9119
+ * 
+ * Created: 2025, December 06
+ * Updated: 2025 December 06
+ * 
+ */
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -14,8 +26,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String kForwardAuto = "MOVE FORWARD";
+  private static final String kTestAuto = "AUTO TEST";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -24,8 +36,8 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.setDefaultOption("MOVE FORWARD", kForwardAuto);
+    m_chooser.addOption("AUTO TEST", kTestAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
   }
 
@@ -60,10 +72,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
+      case kTestAuto:
         // Put custom auto code here
         break;
-      case kDefaultAuto:
+      case kForwardAuto:
       default:
         // Put default auto code here
         break;
