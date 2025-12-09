@@ -3,25 +3,32 @@ pdp 0
 ## Drive
 
 ### FRONT LEFT
-drive 1
-spin 2
+drive: 1
+
+turn: 2
 
 ### FRONT RIGHT
-drive 3
-spin 4
+drive: 3
+
+turn: 4
 
 ### BACK LEFT
-drive 5
-spin 6
+drive: 5
+
+turn: 6
 
 ### BACK RIGHT
-drive 7
-spin 8
+drive: 7
+
+turn: 8
 
 ### CANCODERS
-fl 9
-fr 10
-bl 11
-br 12
+Front left: 9
+
+Front right: 10
+
+Back left: 11
+
+Back right: 12
 
 pigeon 13
