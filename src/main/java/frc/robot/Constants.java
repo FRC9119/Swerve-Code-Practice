@@ -33,6 +33,11 @@ public final class Constants {
     public static final double LAUNCHING_LAUNCHER_VOLTAGE = 12;
     public static final double SPIN_UP_FEEDER_VOLTAGE = -6;
     public static final double SPIN_UP_SECONDS = 1;
+
+    // 
+    public static final int MAX_CLIMB_VOLTAGE = -0 ;
+    public static final int MAX_CLIMB_CURRENT = 60 ;
+    
   }
 
 }
