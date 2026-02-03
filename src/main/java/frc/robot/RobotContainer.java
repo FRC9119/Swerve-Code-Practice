@@ -34,6 +34,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
@@ -70,9 +71,9 @@ public Command getAutonomousCommand() {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.y().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));
-        joystick.b().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
-        joystick.x().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
+        operatorController.y().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));
+        operatorController.b().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
+        operatorController.x().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
