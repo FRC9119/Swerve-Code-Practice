@@ -7,27 +7,25 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.Joystick;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.FuelConstants.*;
 
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
-  private final WPI_TalonSRX intakeLauncherRoller;
+  private final SparkMax intakeLauncherRoller;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    intakeLauncherRoller = new WPI_TalonSRX(INTAKE_LAUNCHER_MOTOR_ID);
+    intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
 
     // put default values for various fuel operations onto the dashboard
@@ -40,9 +38,11 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
     
-    TalonSRXConfiguration intakeConfig = new TalonSRXConfiguration();
-    intakeConfig.peakCurrentLimit=LAUNCHER_MOTOR_CURRENT_LIMIT;
-    intakeLauncherRoller.configAllSettings(intakeConfig);
+   SparkMaxConfig intakeConfig = new SparkMaxConfig();
+    intakeConfig.inverted(true);
+    intakeConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
+    intakeLauncherRoller.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
   }
@@ -51,7 +51,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void intake() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeLauncherRoller
-        .setVoltage(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
+        .setVoltage(-1*SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   // A method to set the rollers to values for ejecting fuel out the intake. Uses
@@ -60,14 +60,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeLauncherRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
+        .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   // A method to set the rollers to values for launching.
   public void launch() {
-    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
+    feederRoller.setVoltage(-1*SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeLauncherRoller
-        .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+        .setVoltage(-1*SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
   }
 
   // A method to stop the rollers
