@@ -12,16 +12,15 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CANFuelSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -31,14 +30,13 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
   private final SendableChooser<Command> autoChooser;
     public RobotContainer() {
         configureBindings();
@@ -59,8 +57,8 @@ public Command getAutonomousCommand() {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.button(5).getAsBoolean() ?  -joystick.getRawAxis(1) * MaxSpeed : -joystick.getRawAxis(1) * MaxSpeed * .3) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.button(5).getAsBoolean() ? -joystick.getRawAxis(0) * MaxSpeed  : -joystick.getRawAxis(0) * MaxSpeed * .3) // Drive left with negative X (left)
+                drive.withVelocityX(joystick.button(5).getAsBoolean() ?  -joystick.getRawAxis(0) * MaxSpeed : -joystick.getRawAxis(0) * MaxSpeed * .3) // Drive forward with negative Y (forward)
+                    .withVelocityY(joystick.button(5).getAsBoolean() ? -joystick.getRawAxis(1) * MaxSpeed  : -joystick.getRawAxis(1) * MaxSpeed * .3) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRawAxis(4) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -72,10 +70,9 @@ public Command getAutonomousCommand() {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+        joystick.y().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));
+        joystick.b().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
+        joystick.x().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
