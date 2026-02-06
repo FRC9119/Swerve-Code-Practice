@@ -58,8 +58,8 @@ public Command getAutonomousCommand() {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.button(5).getAsBoolean() ?  joystick.getRawAxis(0) * MaxSpeed : joystick.getRawAxis(0) * MaxSpeed * .3) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.button(5).getAsBoolean() ? -joystick.getRawAxis(1) * MaxSpeed  : -joystick.getRawAxis(1) * MaxSpeed * .3) // Drive left with negative X (left)
+                drive.withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) // Drive forward with negative Y (forward)
+                    .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
