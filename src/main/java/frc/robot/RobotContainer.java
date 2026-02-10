@@ -25,7 +25,8 @@ import frc.robot.subsystems.CANFuelSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+                                                                                      // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -39,43 +40,54 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
-  private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser;
+
     public RobotContainer() {
         configureBindings();
-         // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
+        // Build an auto chooser. This will use Commands.none() as the default option.
+        autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Another option that allows you to specify the default auto by its name
-    // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+        // Another option that allows you to specify the default auto by its name
+        // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
-public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
+
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
+    }
+
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) // Drive forward with negative Y (forward)
-                    .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) // Drive
+                                                                                                                      // forward
+                                                                                                                      // with
+                                                                                                                      // negative
+                                                                                                                      // Y
+                                                                                                                      // (forward)
+                        .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X
+                                                                                          // (left)
+                        .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
+                                                                                      // negative X (left)
+                ));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-            drivetrain.applyRequest(() -> idle).ignoringDisable(true)
-        );
+                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().withTimeout(SPIN_UP_SECONDS).andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
-        operatorController.b().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
-        operatorController.x().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
-
+        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().withTimeout(SPIN_UP_SECONDS)
+                .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
+        operatorController.b()
+                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
+        operatorController.x()
+                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
+        operatorController.a()
+                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(), () -> ballSubsystem.stop()));
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
