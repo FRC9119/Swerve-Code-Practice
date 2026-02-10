@@ -13,7 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
@@ -21,6 +21,7 @@ import static frc.robot.Constants.FuelConstants.*;
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final SparkMax intakeLauncherRoller;
+  public BangBangController launchController;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
@@ -45,6 +46,10 @@ public class CANFuelSubsystem extends SubsystemBase {
 
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
+
+    launchController = new BangBangController();
+    launchController.setSetpoint(FLYWHEEL_RPM);
+    launchController.setTolerance(25);
   }
 
   // A method to set the rollers to values for intaking
@@ -73,7 +78,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void launch() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeLauncherRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+        .set(-1*launchController.calculate(-1*intakeLauncherRoller.getEncoder().getVelocity()));
+        
   }
 
   // A method to stop the rollers
@@ -87,8 +93,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void spinUp() {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+   intakeLauncherRoller
+        .set(-1*launchController.calculate(-1*intakeLauncherRoller.getEncoder().getVelocity()));
   }
 
   // A command factory to turn the spinUp method into a command that requires this
