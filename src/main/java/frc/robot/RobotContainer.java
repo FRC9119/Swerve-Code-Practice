@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.FuelConstants.SPIN_UP_SECONDS;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -71,7 +72,7 @@ public Command getAutonomousCommand() {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        operatorController.y().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));
+        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().withTimeout(SPIN_UP_SECONDS).andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
         operatorController.b().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
         operatorController.x().whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
 
