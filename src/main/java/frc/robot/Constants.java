@@ -28,18 +28,17 @@ public final class Constants {
     // based on exact robot construction.
     // See the Software Guide for tuning information
     public static final double INTAKING_FEEDER_VOLTAGE = 8;
-    public static final double INTAKING_INTAKE_VOLTAGE = 10;
+    public static final double INTAKING_INTAKE_VOLTAGE = -10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 10;
-    public static final double LAUNCHING_LAUNCHER_VOLTAGE = 12;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
-    public static final double LAUNCH_RPM = 3000;
+    public static final double LAUNCH_RPM = 4000;
     public static final double LAUNCH_TOLERANCE = 5;
 
     public static final double LAUNCH_P = 0.0003;
     public static final double LAUNCH_I = 0;
     public static final double LAUNCH_D = 0;
     public static final double LAUNCH_KS = .25;
-    public static final double LAUNCH_KV = .134;
+    public static final double LAUNCH_KV = .18;
 
     // 
     public static final int MAX_CLIMB_VOLTAGE = -0 ;
