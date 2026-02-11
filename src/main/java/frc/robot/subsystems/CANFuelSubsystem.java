@@ -13,7 +13,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
@@ -21,8 +23,8 @@ import static frc.robot.Constants.FuelConstants.*;
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final SparkMax intakeLauncherRoller;
-  public BangBangController launchController;
-
+  public PIDController launchPID;
+  private SimpleMotorFeedforward launchFeedforward;
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
@@ -46,10 +48,12 @@ public class CANFuelSubsystem extends SubsystemBase {
 
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
-
-    launchController = new BangBangController();
-    launchController.setSetpoint(FLYWHEEL_RPM);
-    launchController.setTolerance(25);
+    
+    launchPID = new PIDController(LAUNCH_P,LAUNCH_I,LAUNCH_D);
+    launchPID.setSetpoint(LAUNCH_RPM);
+    launchPID.setTolerance(LAUNCH_TOLERANCE);
+  
+    launchFeedforward = new SimpleMotorFeedforward(LAUNCH_KS,LAUNCH_KV);
   }
 
   // A method to set the rollers to values for intaking
@@ -78,8 +82,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void launch() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeLauncherRoller
-        .set(-1*launchController.calculate(-1*intakeLauncherRoller.getEncoder().getVelocity()));
-        
+           .set(-(launchFeedforward.calculate(LAUNCH_RPM/60)/12 +MathUtil.clamp(launchPID.calculate(-intakeLauncherRoller.getEncoder().getVelocity()), -1, 1)));
+                  System.out.println(launchPID.getError());
+
   }
 
   // A method to stop the rollers
@@ -94,8 +99,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
    intakeLauncherRoller
-        .set(-1*launchController.calculate(-1*intakeLauncherRoller.getEncoder().getVelocity()));
-  }
+           .set(-(launchFeedforward.calculate(50)/12 +MathUtil.clamp(launchPID.calculate(-intakeLauncherRoller.getEncoder().getVelocity()), -1, 1)));
+          System.out.println(launchPID.getError());
+          }
 
   // A command factory to turn the spinUp method into a command that requires this
   // subsystem

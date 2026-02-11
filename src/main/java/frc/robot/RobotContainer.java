@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.FuelConstants.SPIN_UP_SECONDS;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -80,7 +79,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchController.atSetpoint())
+        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchPID.atSetpoint())
                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
         operatorController.b()
                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
