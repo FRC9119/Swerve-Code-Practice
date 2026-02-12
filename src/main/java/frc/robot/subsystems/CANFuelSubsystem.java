@@ -17,13 +17,14 @@ import static frc.robot.Constants.FuelConstants.*;
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final TalonFX launcherRoller;
+  private final TalonFX intakeRoller;
   public BangBangController launchBang;
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    launcherRoller = new TalonFX(INTAKE_LAUNCHER_MOTOR_ID);
+    launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID);
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
-    
+    intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
     // put default values for various fuel operations onto the dashboard
     // all methods in this subsystem pull their values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
@@ -44,13 +45,13 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to set the rollers to values for intaking
   public void intake() {
     feederRoller.setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    launcherRoller
+    intakeRoller
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   public void unclog() {
     feederRoller.setVoltage(-6);
-    launcherRoller
+    intakeRoller
         .setVoltage(8);
   }
 
@@ -59,7 +60,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void eject() {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    launcherRoller
+    intakeRoller
         .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
@@ -76,11 +77,13 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void stop() {
     feederRoller.set(0);
     launcherRoller.set(0);
+    intakeRoller.set(0);
   }
 
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
+    intakeRoller.setVoltage(-7);
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
    launcherRoller

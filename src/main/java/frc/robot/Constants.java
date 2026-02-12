@@ -17,8 +17,9 @@ package frc.robot;
 public final class Constants {
   public static final class FuelConstants {
     // Motor controller IDs for Fuel Mechanism motors
+    public static final int INTAKE_MOTOR_ID = 16;
     public static final int FEEDER_MOTOR_ID = 15;
-    public static final int INTAKE_LAUNCHER_MOTOR_ID = 14;
+    public static final int LAUNCHER_MOTOR_ID = 14;
 
     // Current limit and nominal voltage for fuel mechanism motors.
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 60;
@@ -28,10 +29,10 @@ public final class Constants {
     // based on exact robot construction.
     // See the Software Guide for tuning information
     public static final double INTAKING_FEEDER_VOLTAGE = 8;
-    public static final double INTAKING_INTAKE_VOLTAGE = -10;
+    public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 10;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
-    public static final double LAUNCH_RPM = 4000;
+    public static final double LAUNCH_RPM = 3500;
     public static final double LAUNCH_TOLERANCE = 5;
 
     public static final double LAUNCH_P = 0.0003;
