@@ -79,7 +79,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchPID.atSetpoint())
+        operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchBang.atSetpoint())
                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
         operatorController.b()
                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));

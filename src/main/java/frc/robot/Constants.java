@@ -38,7 +38,7 @@ public final class Constants {
     public static final double LAUNCH_I = 0;
     public static final double LAUNCH_D = 0;
     public static final double LAUNCH_KS = .25;
-    public static final double LAUNCH_KV = .18;
+    public static final double LAUNCH_KV = .15;
 
     // 
     public static final int MAX_CLIMB_VOLTAGE = -0 ;

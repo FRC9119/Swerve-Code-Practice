@@ -9,22 +9,19 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
 
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
-  private final TalonFX intakeLauncherRoller;
-  public PIDController launchPID;
-  private SimpleMotorFeedforward launchFeedforward;
+  private final TalonFX launcherRoller;
+  public BangBangController launchBang;
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    intakeLauncherRoller = new TalonFX(INTAKE_LAUNCHER_MOTOR_ID);
+    launcherRoller = new TalonFX(INTAKE_LAUNCHER_MOTOR_ID);
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
     
     // put default values for various fuel operations onto the dashboard
@@ -39,23 +36,21 @@ public class CANFuelSubsystem extends SubsystemBase {
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
     
-    launchPID = new PIDController(LAUNCH_P,LAUNCH_I,LAUNCH_D);
-    launchPID.setSetpoint(LAUNCH_RPM);
-    launchPID.setTolerance(LAUNCH_TOLERANCE);
-  
-    launchFeedforward = new SimpleMotorFeedforward(LAUNCH_KS,LAUNCH_KV);
+    launchBang = new BangBangController();
+    launchBang.setSetpoint(LAUNCH_RPM);
+    launchBang.setTolerance(LAUNCH_TOLERANCE);
   }
 
   // A method to set the rollers to values for intaking
   public void intake() {
     feederRoller.setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
+    launcherRoller
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   public void unclog() {
     feederRoller.setVoltage(-6);
-    intakeLauncherRoller
+    launcherRoller
         .setVoltage(8);
   }
 
@@ -64,23 +59,23 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void eject() {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
+    launcherRoller
         .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   // A method to set the rollers to values for launching.
   public void launch() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-           .set((launchFeedforward.calculate(LAUNCH_RPM/60)/12 +MathUtil.clamp(launchPID.calculate(intakeLauncherRoller.getVelocity().getValueAsDouble()*60), -1, 1)));
-                  System.out.println(launchPID.getError());
+    launcherRoller
+           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
+                  System.out.println(launchBang.getError());
 
   }
 
   // A method to stop the rollers
   public void stop() {
     feederRoller.set(0);
-    intakeLauncherRoller.set(0);
+    launcherRoller.set(0);
   }
 
   // A method to spin up the launcher roller while spinning the feeder roller to
@@ -88,9 +83,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void spinUp() {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
-   intakeLauncherRoller
-           .set((launchFeedforward.calculate(50)/12 +MathUtil.clamp(launchPID.calculate(intakeLauncherRoller.getVelocity().getValueAsDouble()*60), -1, 1)));
-          System.out.println(launchPID.getError());
+   launcherRoller
+           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
+          System.out.println(launchBang.getError());
           }
 
   // A command factory to turn the spinUp method into a command that requires this
