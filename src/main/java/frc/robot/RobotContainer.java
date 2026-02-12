@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.FuelConstants.LIMELIGHT_TY_KP;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -25,7 +27,7 @@ import frc.robot.subsystems.CANFuelSubsystem;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
-                                                                                      // max angular velocity
+     private PIDController alignAngleController = new PIDController(LIMELIGHT_TY_KP, 0, 0);                                                                              // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -57,21 +59,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) // Drive
-                                                                                                                      // forward
-                                                                                                                      // with
-                                                                                                                      // negative
-                                                                                                                      // Y
-                                                                                                                      // (forward)
-                        .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X
-                                                                                          // (left)
-                        .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
-                                                                                      // negative X (left)
-                ));
+        
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -98,6 +86,21 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) // Drive
+                                                                                                                      // forward
+                                                                                                                      // with
+                                                                                                                      // negative
+                                                                                                                      // Y
+                                                                                                                      // (forward)
+                        .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X
+                                                                                          // (left)
+                        .withRotationalRate(operatorController.y().getAsBoolean() ? alignAngleController.calculate(0) : -joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
+                                                                                      // negative X (left)
+                ));
     }
 
 }

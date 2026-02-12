@@ -18,6 +18,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final TalonFX launcherRoller;
   private final TalonFX intakeRoller;
+  
   public BangBangController launchBang;
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
@@ -38,7 +39,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
     
     launchBang = new BangBangController();
-    launchBang.setSetpoint(LAUNCH_RPM);
     launchBang.setTolerance(LAUNCH_TOLERANCE);
   }
 
@@ -68,11 +68,13 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void launch() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
-           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
+           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60,MIN_LAUNCH_RPM+this.getTx()*LIMELIGHT_TX_KP));
                   System.out.println(launchBang.getError());
 
   }
-
+public double getTx(){
+  return (LAUNCH_RPM-MIN_LAUNCH_RPM)/LIMELIGHT_TX_KP;
+}
   // A method to stop the rollers
   public void stop() {
     feederRoller.set(0);
@@ -87,7 +89,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
    launcherRoller
-           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
+           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60,MIN_LAUNCH_RPM+this.getTx()*LIMELIGHT_TX_KP));
           System.out.println(launchBang.getError());
           }
 

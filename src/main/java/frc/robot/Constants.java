@@ -35,14 +35,10 @@ public final class Constants {
     public static final double LAUNCH_RPM = 3500;
     public static final double LAUNCH_TOLERANCE = 5;
 
-    public static final double LAUNCH_P = 0.0003;
-    public static final double LAUNCH_I = 0;
-    public static final double LAUNCH_D = 0;
-    public static final double LAUNCH_KS = .25;
-    public static final double LAUNCH_KV = .15;
-
-    // 
-    public static final int MAX_CLIMB_VOLTAGE = -0 ;
+    public static final double LIMELIGHT_TX_KP = .3;
+    public static final double LIMELIGHT_TY_KP = .1;
+    public static final double MIN_LAUNCH_RPM = 2500;
+  
     public static final int MAX_CLIMB_CURRENT = 60 ;
     
   }
