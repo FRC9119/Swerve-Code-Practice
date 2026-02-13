@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+java.util.concurrent.TimeUnit;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,7 +19,23 @@ public class ElevatorClimber extends SubsystemBase{
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
     }
 
-    public void climb() {
-        thisWayAndThatWay.setVoltage(SmartDashboard.getNumber("Elevating climb value", MAX_CLIMB_CURRENT));
+    public void L1climb() {
+        thisWayAndThatWay.set(1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(-1);
+    }
+
+    public void L3climb() {
+        thisWayAndThatWay.set(1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(-1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(-1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(1);
+        TimeUnit.SECONDS.sleep(30);
+        thisWayAndThatWay.set(-1);
     }
 }
