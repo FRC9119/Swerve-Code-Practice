@@ -41,8 +41,7 @@ public final class Constants {
     public static final double LAUNCH_KS = .25;
     public static final double LAUNCH_KV = .15;
 
-    // 
-    public static final int MAX_CLIMB_VOLTAGE = -0 ;
+    // Current for the motor for the Climber
     public static final int MAX_CLIMB_CURRENT = 60 ;
     
   }
