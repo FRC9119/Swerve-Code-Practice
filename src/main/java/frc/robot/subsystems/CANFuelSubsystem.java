@@ -69,6 +69,7 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // A method to set the rollers to values for launching.
   public void launch() {
+    launchBang.setSetpoint(getTargetRPM());
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
            .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
@@ -83,8 +84,8 @@ public class CANFuelSubsystem extends SubsystemBase {
     intakeRoller.set(0);
   }
   public double getTargetRPM(){
-    if (USE_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
-    else return drivetrain.getState().Pose.getTranslation().getDistance(new Translation2d(4.0346, 4.2655));
+    if (USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
+    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * drivetrain.getState().Pose.getTranslation().getDistance(new Translation2d(4.0346, 4.2655));
   }
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
