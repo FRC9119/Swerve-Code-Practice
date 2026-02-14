@@ -107,7 +107,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
-
+  public Command intakeCommand(){
+    return this.run(() -> intake());
+  }
   // A command factory to turn the launch method into a command that requires this
   // subsystem
   public Command launchCommand() {

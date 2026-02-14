@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -50,6 +51,10 @@ public class RobotContainer {
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        NamedCommands.registerCommand("spinUP",ballSubsystem.spinUpCommand());
+        NamedCommands.registerCommand("launchCommand", ballSubsystem.launchCommand());
+        NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
     }
 
     public Command getAutonomousCommand() {
