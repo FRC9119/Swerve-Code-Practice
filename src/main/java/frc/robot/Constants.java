@@ -41,9 +41,16 @@ public final class Constants {
     public static final double LAUNCH_KS = .25;
     public static final double LAUNCH_KV = .15;
 
+    
+    
+  }
+
+  public static final class ClimbConstants {
+    public static final int CLIMB_MOTOR_ID = 18;
     // Current for the motor for the Climber
     public static final int MAX_CLIMB_CURRENT = 60 ;
-    
+    // Time for motor to rotate in one direction, in seconds
+    public static final long CLIMB_CYCLE_TIME = 3;
   }
 
 }

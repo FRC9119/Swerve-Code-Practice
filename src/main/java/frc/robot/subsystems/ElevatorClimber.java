@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.FuelConstants.*;
+import static frc.robot.Constants.ClimbConstants.*;
 
 public class ElevatorClimber extends SubsystemBase{
     private final TalonFX thisWayAndThatWay;
@@ -20,22 +19,30 @@ public class ElevatorClimber extends SubsystemBase{
     }
 
     public void L1climb() {
+        try {
         thisWayAndThatWay.set(1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
+        } catch (InterruptedException e) {
+System.out.println(e);
+        }
     }
 
-    public void L3climb() {
+    public void LCLIMB_CYCLE_TIMEclimb() {
+        try{
         thisWayAndThatWay.set(1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(1);
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
+        } catch (InterruptedException e) {
+System.out.println(e);
+        }
     }
 }
