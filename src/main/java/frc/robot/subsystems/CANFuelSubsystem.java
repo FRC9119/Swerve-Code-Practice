@@ -8,12 +8,13 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
@@ -84,8 +85,10 @@ public class CANFuelSubsystem extends SubsystemBase {
     intakeRoller.set(0);
   }
   public double getTargetRPM(){
-    if (USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
-    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * drivetrain.getState().Pose.getTranslation().getDistance(new Translation2d(4.0346, 4.2655));
+    Translation2d coordinates = drivetrain.getState().Pose.getTranslation();
+    Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(16.5409,8.0693)).minus(coordinates) : coordinates;
+    if (!USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
+    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * blueCoordinates.getDistance(new Translation2d(4.0346, 4.2655));
   }
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
