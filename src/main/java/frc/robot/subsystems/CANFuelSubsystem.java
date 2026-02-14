@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
@@ -18,9 +19,11 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final TalonFX launcherRoller;
   private final TalonFX intakeRoller;
+  private final CommandSwerveDrivetrain drivetrain;
   public BangBangController launchBang;
   /** Creates a new CANBallSubsystem. */
-  public CANFuelSubsystem() {
+  public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
+    this.drivetrain = drivetrain;
     // create brushed motors for each of the motors on the launcher mechanism
     launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID);
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
@@ -38,7 +41,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
     
     launchBang = new BangBangController();
-    launchBang.setSetpoint(LAUNCH_RPM);
+    launchBang.setSetpoint(DEFAULT_LAUNCH_RPM);
     launchBang.setTolerance(LAUNCH_TOLERANCE);
   }
 
@@ -79,10 +82,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller.set(0);
     intakeRoller.set(0);
   }
-
+  public double getTargetRPM(){
+    if (USE_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
+    else return drivetrain.getState().Pose.getTranslation().getDistance(new Translation2d(4.0346, 4.2655));
+  }
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
+    launchBang.setSetpoint(getTargetRPM());
     intakeRoller.setVoltage(-7);
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));

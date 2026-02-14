@@ -32,7 +32,7 @@ public final class Constants {
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 10;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
-    public static final double LAUNCH_RPM = 3500;
+    public static final double DEFAULT_LAUNCH_RPM = 3500;
     public static final double LAUNCH_TOLERANCE = 5;
 
     public static final double LAUNCH_P = 0.0003;
@@ -41,7 +41,7 @@ public final class Constants {
     public static final double LAUNCH_KS = .25;
     public static final double LAUNCH_KV = .15;
 
-    
+    public static final boolean USE_LIMELIGHT = false;
     
   }
 

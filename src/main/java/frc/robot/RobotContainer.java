@@ -38,7 +38,7 @@ public class RobotContainer {
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
+    public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
