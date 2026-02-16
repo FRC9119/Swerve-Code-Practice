@@ -7,12 +7,20 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.FuelConstants.FULL_FIELD_X;
+import static frc.robot.Constants.FuelConstants.FULL_FIELD_Y;
+import static frc.robot.Constants.FuelConstants.HUB_X_COORD;
+import static frc.robot.Constants.FuelConstants.HUB_Y_COORD;
+import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.Constants.FuelConstants.*;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -38,6 +47,7 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
+    private final PIDController shootAimPID = new PIDController(SHOOT_AIM_KP, SHOOT_AIM_KI, SHOOT_AIM_KD);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
     private final SendableChooser<Command> autoChooser;
@@ -60,7 +70,10 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
-
+private double getRadiansBetweenRobotAndHub (){
+        Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(FULL_FIELD_X,FULL_FIELD_Y)).minus(drivetrain.getState().Pose.getTranslation()) : drivetrain.getState().Pose.getTranslation();
+        return Math.atan2(bluePose.getX()-HUB_Y_COORD,bluePose.getX()-HUB_X_COORD);
+}
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -74,7 +87,7 @@ public class RobotContainer {
                                                                                                                       // (forward)
                         .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X
                                                                                           // (left)
-                        .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
+                        .withRotationalRate(operatorController.y().getAsBoolean() && USE_SHOOTER_LIMELIGHT ? shootAimPID.calculate(drivetrain.getState().Pose.getRotation().getRadians(), getRadiansBetweenRobotAndHub()) : -joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
                                                                                       // negative X (left)
                 ));
 
@@ -84,6 +97,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
+                
         operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchBang.atSetpoint())
                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
         operatorController.b()

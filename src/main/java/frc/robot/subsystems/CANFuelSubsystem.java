@@ -86,9 +86,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
   public double getTargetRPM(){
     Translation2d coordinates = drivetrain.getState().Pose.getTranslation();
-    Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(16.5409,8.0693)).minus(coordinates) : coordinates;
+    Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(FULL_FIELD_X,FULL_FIELD_Y)).minus(coordinates) : coordinates;
     if (!USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
-    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * blueCoordinates.getDistance(new Translation2d(4.0346, 4.2655));
+    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
   }
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
