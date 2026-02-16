@@ -22,7 +22,15 @@ public class ElevatorClimber extends SubsystemBase{
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
 
     }
-
+    public void align(Alignment a){
+        switch (a) {
+            case Left: 
+            case Right:
+        }
+    }
+public enum Alignment {
+    Left, Right
+}
     public void L1climb() {
         try {
         thisWayAndThatWay.set(1);
