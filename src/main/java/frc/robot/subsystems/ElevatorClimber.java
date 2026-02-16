@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,9 +14,13 @@ public class ElevatorClimber extends SubsystemBase{
 
     public ElevatorClimber() {
 
-        thisWayAndThatWay = new TalonFX(MAX_CLIMB_CURRENT);
-
+        thisWayAndThatWay = new TalonFX(CLIMB_MOTOR_ID);
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.CurrentLimits.SupplyCurrentLimit = MAX_CLIMB_CURRENT;
+        thisWayAndThatWay.getConfigurator().apply(config);
+    
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
+
     }
 
     public void L1climb() {
