@@ -16,7 +16,7 @@ package frc.robot;
  */
 public final class Constants {
   public static final class FuelConstants {
-    // Motor controller IDs for Fuel Mechanism motors
+    // Motor controller CAN IDs for Fuel mechanisms
     public static final int INTAKE_MOTOR_ID = 16;
     public static final int FEEDER_MOTOR_ID = 15;
     public static final int LAUNCHER_MOTOR_ID = 14;
@@ -32,27 +32,34 @@ public final class Constants {
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 10;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
-
+  
+    // RPMs for shooter
     public static final double DEFAULT_LAUNCH_RPM = 3500;
     public static final double AT_HUB_LAUNCH_RPM = 2500;
+
+    // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = 5;
 
+    // PID controls for rotating bot to shoot
     public static final double SHOOT_AIM_KP = .01;
     public static final double SHOOT_AIM_KI = 0;
     public static final double SHOOT_AIM_KD = 0;
 
+    // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
     public static final double LIMELIGHT_RPM_KP = .01;
+
     public static final boolean USE_SHOOTER_LIMELIGHT = false;
+
     // Coordinates are in meters from the right corner on the blue alliance side
     public static final double HUB_X_COORD = 4.0346;
     public static final double HUB_Y_COORD = 4.2655;
-
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;
 
   }
 
   public static final class ClimbConstants {
+    // CAN ID for climb kraken
     public static final int CLIMB_MOTOR_ID = 18;
     // Current for the motor for the Climber
     public static final int MAX_CLIMB_CURRENT = 60;
