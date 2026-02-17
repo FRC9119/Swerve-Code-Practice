@@ -52,6 +52,9 @@ public class RobotContainer {
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
+        LimelightHelpers.setupPortForwardingUSB(0);
+                LimelightHelpers.setupPortForwardingUSB(1);
+
     }
 
     public Command getAutonomousCommand() {
