@@ -65,6 +65,11 @@ public final class Constants {
     public static final int MAX_CLIMB_CURRENT = 60;
     // Time for motor to rotate in one direction, in seconds
     public static final long CLIMB_CYCLE_TIME = 3;
+
+    public static final double ALIGN_X_KP = 0;
+    public static final double ALIGN_Y_KP = 0;
+    public static final double ALIGN_THETA_KP = 0;
+
   }
 
 }
