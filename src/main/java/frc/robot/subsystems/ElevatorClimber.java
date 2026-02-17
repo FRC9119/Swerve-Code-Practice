@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -9,9 +8,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Dashboard;
+
 import static frc.robot.Constants.ClimbConstants.*;
 
 public class ElevatorClimber extends SubsystemBase{
@@ -21,21 +20,13 @@ private final CommandSwerveDrivetrain drivetrain;
 private final PIDController alignX = new PIDController(ALIGN_X_KP,0,0);     
       private final  PIDController alignY = new PIDController(ALIGN_Y_KP,0,0);
       private final  PIDController alignTheta = new PIDController(ALIGN_THETA_KP,0,0);
-      private final SendableChooser<Alignment> alignmentChooser;
-    public ElevatorClimber(SwerveRequest.FieldCentric drive, CommandSwerveDrivetrain drivetrain) {
+    public ElevatorClimber(SwerveRequest.FieldCentric drive, CommandSwerveDrivetrain drivetrain, Dashboard dash) {
         this.drive = drive;
         this.drivetrain = drivetrain;
         thisWayAndThatWay = new TalonFX(CLIMB_MOTOR_ID);
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.CurrentLimits.SupplyCurrentLimit = MAX_CLIMB_CURRENT;
         thisWayAndThatWay.getConfigurator().apply(config);
-    
-        SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
-        alignmentChooser = new SendableChooser<Alignment>();
-        alignmentChooser.addOption("left", Alignment.Left);
-                alignmentChooser.addOption("right", Alignment.Right);
-
-        SmartDashboard.putData("Alignment for tele-op climb", alignmentChooser);
     }
     public void align(Alignment a){
         Pose2d goalPosition;
@@ -61,19 +52,25 @@ private final PIDController alignX = new PIDController(ALIGN_X_KP,0,0);
 public enum Alignment {
     Left, Right
 }
-    public void L1climb(Optional<Alignment> a) {
-        if (USE_CLIMB_LIMEIGHT && a.isPresent()) align(a.get());
+    public void L1climb(Alignment a) {
+        align(a);
+        L1climb();
+    }
+    public void L1climb(){
         try {
         thisWayAndThatWay.set(1);
         TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
         } catch (InterruptedException e) {
-System.out.println(e);
+            System.out.println(e);
         }
     }
 
-    public void L3climb(Optional<Alignment> a) {
-        if (USE_CLIMB_LIMEIGHT && a.isPresent()) align(a.get());
+    public void L3climb(Alignment a) {
+        align(a);
+        L3climb();
+    }
+    public void L3climb(){
         try{
         thisWayAndThatWay.set(1);
         TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
@@ -86,8 +83,8 @@ System.out.println(e);
         thisWayAndThatWay.set(1);
         TimeUnit.SECONDS.sleep(CLIMB_CYCLE_TIME);
         thisWayAndThatWay.set(-1);
-        } catch (InterruptedException e) {
-System.out.println(e);
+        } catch (InterruptedException e) {  
+            System.out.println(e);
         }
     }
 }

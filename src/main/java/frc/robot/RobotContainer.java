@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.Dashboard;
 import static frc.robot.Constants.FuelConstants.*;
 
 public class RobotContainer {
@@ -50,6 +51,7 @@ public class RobotContainer {
     private final PIDController shootAimPID = new PIDController(SHOOT_AIM_KP, SHOOT_AIM_KI, SHOOT_AIM_KD);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
+    public final Dashboard dash = new Dashboard();
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
