@@ -24,11 +24,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ElevatorClimber;
+import frc.robot.subsystems.ElevatorClimber.Alignment;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.Dashboard;
 import static frc.robot.Constants.FuelConstants.*;
@@ -44,6 +47,7 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
+    public final Dashboard dash = new Dashboard();
 
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -51,7 +55,7 @@ public class RobotContainer {
     private final PIDController shootAimPID = new PIDController(SHOOT_AIM_KP, SHOOT_AIM_KI, SHOOT_AIM_KD);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
-    public final Dashboard dash = new Dashboard();
+    public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -67,6 +71,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("spinUp",ballSubsystem.spinUpCommand());
         NamedCommands.registerCommand("launch", ballSubsystem.launchCommand());
         NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
+        // TODO: use Commands.doUntil somehow
+        NamedCommands.registerCommand("alignLeft", climbSubsystem.align(Alignment.Left));
+        NamedCommands.registerCommand("alignRight", climbSubsystem.align(Alignment.Right));
+
     }
 
     public Command getAutonomousCommand() {
@@ -99,7 +107,7 @@ private double getRadiansBetweenRobotAndHub (){
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-                
+                // TODO: use ctre brake request
         operatorController.y().whileTrue(ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchBang.atSetpoint())
                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
         operatorController.b()

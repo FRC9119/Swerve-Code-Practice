@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Dashboard;
 
@@ -28,8 +29,9 @@ private final PIDController alignX = new PIDController(ALIGN_X_KP,0,0);
         config.CurrentLimits.SupplyCurrentLimit = MAX_CLIMB_CURRENT;
         thisWayAndThatWay.getConfigurator().apply(config);
     }
-    public void align(Alignment a){
-        Pose2d goalPosition;
+    public Command align(Alignment a){
+        return this.run(() -> {
+            Pose2d goalPosition;
         Pose2d currentPosition = drivetrain.getState().Pose;
         switch (a) {
             case Left: 
@@ -43,10 +45,9 @@ private final PIDController alignX = new PIDController(ALIGN_X_KP,0,0);
         alignX.setSetpoint(goalPosition.getX());
         alignY.setSetpoint(goalPosition.getY());
         alignTheta.setSetpoint(goalPosition.getRotation().getRadians());
-
-
+        // TODO: change this to CTRE FieldCentricFacingAngle
         drivetrain.applyRequest(() -> drive.withVelocityX(alignX.calculate(currentPosition.getX())).withVelocityY(currentPosition.getY()).withRotationalRate(currentPosition.getRotation().getRadians()));
-        
+    });
     
     }
 public enum Alignment {
