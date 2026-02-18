@@ -65,7 +65,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         NamedCommands.registerCommand("spinUp",ballSubsystem.spinUpCommand());
-        NamedCommands.registerCommand("launchCommand", ballSubsystem.launchCommand());
+        NamedCommands.registerCommand("launch", ballSubsystem.launchCommand());
         NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
     }
 
