@@ -12,8 +12,6 @@ import static frc.robot.Constants.FuelConstants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -55,28 +53,8 @@ public class RobotContainer {
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
         public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
-        private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
-
-                NamedCommands.registerCommand("launch",
-                                ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand()));
-                NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
-                NamedCommands.registerCommand("ballSubsytemStop", ballSubsystem.stopCommand());
-                // TODO: use Commands.doUntil somehow
-                NamedCommands.registerCommand("alignLeft", climbSubsystem.align(Alignment.Left));
-                NamedCommands.registerCommand("alignRight", climbSubsystem.align(Alignment.Right));
-                drivetrain.configureAutoBuilder();
-                autoChooser = AutoBuilder.buildAutoChooser();
-
-                // Another option that allows you to specify the default auto by its name
-                // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
-
-                SmartDashboard.putData("Auto Chooser", autoChooser);
-
-                // Build an auto chooser. This will use Commands.none() as the default option.
-
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
@@ -84,16 +62,14 @@ public class RobotContainer {
 
         }
 
-        public Command getAutonomousCommand() {
-                return autoChooser.getSelected();
-        }
-
         public double getRadiansBetweenRobotAndHub() {
                 Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
                                 ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
                                                 .minus(drivetrain.getState().Pose.getTranslation())
                                 : drivetrain.getState().Pose.getTranslation();
-                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
+                                System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
+                                // System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
+                                return Math.PI - Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
 
         private void configureBindings() {
