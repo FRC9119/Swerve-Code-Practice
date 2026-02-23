@@ -285,7 +285,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        this.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("shoot").pose, Timer.getFPGATimestamp());
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("shoot");
+        boolean rotatingTooFast = Math.abs(this.getPigeon2().getAngularVelocityXDevice().getValueAsDouble()) > 100;
+        if(!rotatingTooFast && mt2.tagCount != 0){
+            this.addVisionMeasurement(mt2.pose, Timer.getFPGATimestamp());
+        }
         //         this.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("climb").pose, Timer.getFPGATimestamp());
 
     }

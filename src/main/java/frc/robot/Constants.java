@@ -40,11 +40,6 @@ public final class Constants {
     // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = 5;
 
-    // PID controls for rotating bot to shoot
-    public static final double SHOOT_AIM_KP = .01;
-    public static final double SHOOT_AIM_KI = 0;
-    public static final double SHOOT_AIM_KD = 0;
-
     // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
     public static final double LIMELIGHT_RPM_KP = .01;
 
