@@ -34,7 +34,7 @@ public final class Constants {
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
   
     // RPMs for shooter
-    public static final double DEFAULT_LAUNCH_RPM = 3500;
+    public static final double DEFAULT_LAUNCH_RPM = 3400;
     public static final double AT_HUB_LAUNCH_RPM = 2500;
 
     // When shooter is at + or - this RPM, it is considered at its setpoint

@@ -59,8 +59,15 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        configureBindings();
-        // Build an auto chooser. This will use Commands.none() as the default option.
+        
+        
+         NamedCommands.registerCommand("launch", ballSubsystem.spinUpCommand().until(()->ballSubsystem.launchBang.atSetpoint()).andThen(ballSubsystem.launchCommand()));
+        NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
+        NamedCommands.registerCommand("ballSubsytemStop", ballSubsystem.stopCommand());
+        // TODO: use Commands.doUntil somehow
+        NamedCommands.registerCommand("alignLeft", climbSubsystem.align(Alignment.Left));
+        NamedCommands.registerCommand("alignRight", climbSubsystem.align(Alignment.Right));
+       drivetrain.configureAutoBuilder();
         autoChooser = AutoBuilder.buildAutoChooser();
 
         // Another option that allows you to specify the default auto by its name
@@ -68,12 +75,13 @@ public class RobotContainer {
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        NamedCommands.registerCommand("spinUp",ballSubsystem.spinUpCommand());
-        NamedCommands.registerCommand("launch", ballSubsystem.launchCommand());
-        NamedCommands.registerCommand("intake", ballSubsystem.intakeCommand());
-        // TODO: use Commands.doUntil somehow
-        NamedCommands.registerCommand("alignLeft", climbSubsystem.align(Alignment.Left));
-        NamedCommands.registerCommand("alignRight", climbSubsystem.align(Alignment.Right));
+          // Build an auto chooser. This will use Commands.none() as the default option.
+
+        LimelightHelpers.setupPortForwardingUSB(0);
+        LimelightHelpers.setupPortForwardingUSB(1);
+        
+
+        configureBindings();
 
     }
 
@@ -97,7 +105,7 @@ private double getRadiansBetweenRobotAndHub (){
                                                                                                                       // (forward)
                         .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) // Drive left with negative X
                                                                                           // (left)
-                        .withRotationalRate(operatorController.y().getAsBoolean() && USE_SHOOTER_LIMELIGHT ? shootAimPID.calculate(drivetrain.getState().Pose.getRotation().getRadians(), getRadiansBetweenRobotAndHub()) : -joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
+                        .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with
                                                                                       // negative X (left)
                 ));
 

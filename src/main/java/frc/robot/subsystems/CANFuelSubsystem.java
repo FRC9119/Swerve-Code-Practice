@@ -84,11 +84,11 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller.set(0);
     intakeRoller.set(0);
   }
-  public double getTargetRPM(){
+  public double getTargetRPM(){    if (!USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
+
     Translation2d coordinates = drivetrain.getState().Pose.getTranslation();
     Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(FULL_FIELD_X,FULL_FIELD_Y)).minus(coordinates) : coordinates;
-    if (!USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
-    else return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * (blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD))- MIN_HUB_DISTANCE);
+    return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * (blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD))- MIN_HUB_DISTANCE);
   }
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
@@ -118,6 +118,9 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   public Command unclogCommand() {
     return this.run(() -> unclog());
+  }
+  public Command stopCommand(){
+    return this.run(() -> stop());
   }
 
   @Override
