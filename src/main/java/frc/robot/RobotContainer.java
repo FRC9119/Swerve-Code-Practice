@@ -69,7 +69,7 @@ public class RobotContainer {
                                 : drivetrain.getState().Pose.getTranslation();
                                 System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
                                 // System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
-                                return Math.PI - Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
+                                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
 
         private void configureBindings() {
