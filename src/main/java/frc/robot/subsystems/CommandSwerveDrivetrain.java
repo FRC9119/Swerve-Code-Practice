@@ -257,10 +257,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+        LimelightHelpers.SetRobotOrientation("limelight-shoot", 90+this.getState().RawHeading.getDegrees(), 0.0, 0.0 ,0.0 ,0.0,0.0);
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
-        boolean rotatingTooFast = Math.abs(this.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 100;
+        boolean rotatingTooFast = Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 100;
         if(!rotatingTooFast && mt2.tagCount != 0){
-            System.out.println(mt2.pose);
             this.addVisionMeasurement(mt2.pose, Timer.getFPGATimestamp());
         }
         //         this.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("climb").pose, Timer.getFPGATimestamp());
