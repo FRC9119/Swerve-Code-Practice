@@ -78,8 +78,8 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)) 
+                                                .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) 
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) 
                                 ));
 
