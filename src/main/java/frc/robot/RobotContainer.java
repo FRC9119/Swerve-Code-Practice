@@ -87,16 +87,16 @@ public class RobotContainer {
                 final var idle = new SwerveRequest.Idle();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-                operatorController.y().whileTrue(drivetrain.applyRequest(() -> {
+                // operatorController.y().whileTrue(drivetrain.applyRequest(() -> {
 
-                        /* Use the hub target to determine where to aim */
-                        return targetHub.withTargetDirection(new Rotation2d(getRadiansBetweenRobotAndHub()))
-                                        .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
-                                        .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)); 
+                //         /* Use the hub target to determine where to aim */
+                //         return targetHub.withTargetDirection(new Rotation2d(getRadiansBetweenRobotAndHub()))
+                //                         .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
+                //                         .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)); 
 
-                }
+                // }
 
-                ));
+                // ));
                 // TODO: use ctre brake request
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
                                 .until(() -> ballSubsystem.launchBang.atSetpoint())
