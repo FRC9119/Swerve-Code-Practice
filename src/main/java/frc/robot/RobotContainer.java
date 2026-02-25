@@ -67,7 +67,6 @@ public class RobotContainer {
                                 ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
                                                 .minus(drivetrain.getState().Pose.getTranslation())
                                 : drivetrain.getState().Pose.getTranslation();
-                                System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
                                 // System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
                                 return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
@@ -92,8 +91,8 @@ public class RobotContainer {
 
                         /* Use the hub target to determine where to aim */
                         return targetHub.withTargetDirection(new Rotation2d(getRadiansBetweenRobotAndHub()))
-                                        .withVelocityX(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8))
-                                        .withVelocityY(Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8)); 
+                                        .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
+                                        .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)); 
 
                 }
 

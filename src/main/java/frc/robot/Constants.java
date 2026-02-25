@@ -46,8 +46,8 @@ public final class Constants {
     public static final boolean USE_SHOOTER_LIMELIGHT = true;
 
     // Coordinates are in meters from the right corner on the blue alliance side
-    public static final double HUB_X_COORD = 4.0346;
-    public static final double HUB_Y_COORD = 4.2655;
+    public static final double HUB_X_COORD = 16.5409/2-3.64745;
+    public static final double HUB_Y_COORD = 4.0346;
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;
     public static final double MIN_HUB_DISTANCE = .5;
