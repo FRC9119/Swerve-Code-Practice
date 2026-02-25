@@ -22,6 +22,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
   public BangBangController launchBang;
+
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -37,10 +38,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
     SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
-
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
-    
+
     launchBang = new BangBangController();
     launchBang.setSetpoint(DEFAULT_LAUNCH_RPM);
     launchBang.setTolerance(LAUNCH_TOLERANCE);
@@ -71,10 +71,11 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to set the rollers to values for launching.
   public void launch() {
     launchBang.setSetpoint(getTargetRPM());
+    intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
-           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
-
+        .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
+    System.out.println("launching");
   }
 
   // A method to stop the rollers
@@ -83,32 +84,40 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller.set(0);
     intakeRoller.set(0);
   }
-  public double getTargetRPM(){    if (!USE_SHOOTER_LIMELIGHT) return DEFAULT_LAUNCH_RPM;
+
+  public double getTargetRPM() {
+    if (!USE_SHOOTER_LIMELIGHT)
+      return DEFAULT_LAUNCH_RPM;
 
     Translation2d coordinates = drivetrain.getState().Pose.getTranslation();
-    Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? (new Translation2d(FULL_FIELD_X,FULL_FIELD_Y)).minus(coordinates) : coordinates;
-    System.out.println(blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD)));
-    return AT_HUB_LAUNCH_RPM + LIMELIGHT_RPM_KP * (blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD))- MIN_HUB_DISTANCE);
+    Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+        ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y)).minus(coordinates)
+        : coordinates;
+    double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
+   System.out.println(distance);
+   System.out.println(coordinates);
+    return SmartDashboard.getNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
   }
+
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
     launchBang.setSetpoint(getTargetRPM());
-    intakeRoller.setVoltage(-7);
-    feederRoller
-        .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
-   launcherRoller
-           .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble()*60));
-          }
+
+    launcherRoller
+        .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
+  }
 
   // A command factory to turn the spinUp method into a command that requires this
   // subsystem
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
-  public Command intakeCommand(){
+
+  public Command intakeCommand() {
     return this.run(() -> intake());
   }
+
   // A command factory to turn the launch method into a command that requires this
   // subsystem
   public Command launchCommand() {
@@ -118,7 +127,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command unclogCommand() {
     return this.run(() -> unclog());
   }
-  public Command stopCommand(){
+
+  public Command stopCommand() {
     return this.run(() -> stop());
   }
 

@@ -264,7 +264,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this.addVisionMeasurement(mt2.pose, Timer.getFPGATimestamp());
         }
         //         this.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("climb").pose, Timer.getFPGATimestamp());
-
+// System.out.println(this.getState().Pose);
     }
 
     private void startSimThread() {

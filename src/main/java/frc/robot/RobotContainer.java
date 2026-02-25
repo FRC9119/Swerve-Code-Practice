@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.*;
 
+import javax.lang.model.element.ModuleElement.UsesDirective;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -67,8 +70,9 @@ public class RobotContainer {
                                 ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
                                                 .minus(drivetrain.getState().Pose.getTranslation())
                                 : drivetrain.getState().Pose.getTranslation();
-                                // System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
-                                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
+                System.out.println();
+                System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
+                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
 
         private void configureBindings() {
@@ -77,30 +81,44 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)) 
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate) 
-                                ));
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
                 final var idle = new SwerveRequest.Idle();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-                // operatorController.y().whileTrue(drivetrain.applyRequest(() -> {
-
-                //         /* Use the hub target to determine where to aim */
-                //         return targetHub.withTargetDirection(new Rotation2d(getRadiansBetweenRobotAndHub()))
-                //                         .withVelocityX(Math.atan(-joystick.getRawAxis(1) * MaxSpeed * .8))
-                //                         .withVelocityY(Math.atan(-joystick.getRawAxis(0) * MaxSpeed * .8)); 
-
-                // }
-
-                // ));
+                /*
+                 * While Y is held AND when constant USE_SHOOTER_LIMELIGHT is true, target hub.
+                 * Otherwise run empty command
+                 */
                 // TODO: use ctre brake request
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
                                 .until(() -> ballSubsystem.launchBang.atSetpoint())
-                                .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()));
+                                .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
+
+                                .whileTrue(drivetrain.applyRequest(() -> {
+                                        if (USE_SHOOTER_LIMELIGHT)
+                                                return targetHub.withTargetDirection(
+                                                                new Rotation2d(getRadiansBetweenRobotAndHub()))
+                                                                .withVelocityX(-Math.atan(
+                                                                                joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                                .withVelocityY(-Math.atan(
+                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                                .withDeadband(0.1);
+                                        else
+                                                return drive
+                                                                .withVelocityX(-Math.atan(
+                                                                                joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                                .withVelocityY(-Math.atan(
+                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                                .withRotationalRate(-joystick.getRawAxis(2)
+                                                                                * MaxAngularRate);
+
+                                }));
+
                 operatorController.b()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
                                                 () -> ballSubsystem.stop()));

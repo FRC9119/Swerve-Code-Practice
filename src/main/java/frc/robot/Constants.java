@@ -35,13 +35,8 @@ public final class Constants {
   
     // RPMs for shooter
     public static final double DEFAULT_LAUNCH_RPM = 3400;
-    public static final double AT_HUB_LAUNCH_RPM = 2600;
-
     // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = 5;
-
-    // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
-    public static final double LIMELIGHT_RPM_KP = 0;
 
     public static final boolean USE_SHOOTER_LIMELIGHT = true;
 
@@ -50,7 +45,6 @@ public final class Constants {
     public static final double HUB_Y_COORD = 4.0346;
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;
-    public static final double MIN_HUB_DISTANCE = .75;
 
   }
 

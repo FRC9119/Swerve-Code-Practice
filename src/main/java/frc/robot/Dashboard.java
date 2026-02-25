@@ -15,5 +15,6 @@ public class Dashboard {
                 alignmentChooser.addOption("right", Alignment.Right);
 
         SmartDashboard.putData("Alignment for tele-op climb", alignmentChooser);
+    SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
     }
 }
