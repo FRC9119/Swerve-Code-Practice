@@ -75,7 +75,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
         .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
-    System.out.println("launching");
   }
 
   // A method to stop the rollers
@@ -95,7 +94,6 @@ public class CANFuelSubsystem extends SubsystemBase {
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
    System.out.println(distance);
-   System.out.println(coordinates);
     return SmartDashboard.getNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
   }
 

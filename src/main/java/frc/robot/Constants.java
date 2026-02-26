@@ -41,7 +41,7 @@ public final class Constants {
     public static final boolean USE_SHOOTER_LIMELIGHT = true;
 
     // Coordinates are in meters from the right corner on the blue alliance side
-    public static final double HUB_X_COORD = 16.5409/2-3.64745;
+    public static final double HUB_X_COORD = 3.977894; //                            LimelightHelpers.SetRobotOrientation("limelight-shoot",this.getPigeon2().getYaw().getValueAsDouble(),0.0,0.0,0.0,0.0,0.0);
     public static final double HUB_Y_COORD = 4.0346;
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;

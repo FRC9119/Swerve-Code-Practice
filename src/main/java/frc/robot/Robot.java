@@ -16,6 +16,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    m_robotContainer.drivetrain.getPigeon2().setYaw(180);
   }
 
   @Override

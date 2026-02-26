@@ -70,8 +70,6 @@ public class RobotContainer {
                                 ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
                                                 .minus(drivetrain.getState().Pose.getTranslation())
                                 : drivetrain.getState().Pose.getTranslation();
-                System.out.println();
-                System.out.println(Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD));
                 return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
 
