@@ -24,6 +24,8 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -67,7 +69,7 @@ public class RobotContainer {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
-                configureBindings();
+                
 
                 autoFactory = new AutoFactory(
                         () -> drivetrain.getState().Pose, 
@@ -78,9 +80,9 @@ public class RobotContainer {
                 );
                 autoChooser = new AutoChooser();
                 autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
-                SmartDashboard.putData(autoChooser);
+                SmartDashboard.putData("auto", autoChooser);
                 RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
-
+configureBindings();
         }
 
         public double getRadiansBetweenRobotAndHub() {
@@ -92,12 +94,13 @@ public class RobotContainer {
         }
 
         // Choreo sample auto routine (from their website)
-        public AutoRoutine pickupAndScoreAuto() {
-                AutoRoutine routine = autoFactory.newRoutine("pickupAndScore");
+        private AutoRoutine pickupAndScoreAuto() {
+                System.out.println("test");
+                AutoRoutine routine = autoFactory.newRoutine("intakeandshoot");
 
                 // Load the routine's trajectories (all of them)
-                AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+                AutoTrajectory pickupTraj = routine.trajectory("intakeFromLeft");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
 
                 // When the routine begins, reset odometry and start the first trajectory 
                 routine.active().onTrue(

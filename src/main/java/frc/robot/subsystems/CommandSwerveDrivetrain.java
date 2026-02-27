@@ -226,7 +226,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = this.getState().Pose;
-
+System.out.println("in followTraj");
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
             sample.vx + xController.calculate(pose.getX(), sample.x),

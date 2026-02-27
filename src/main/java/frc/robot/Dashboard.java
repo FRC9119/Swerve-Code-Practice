@@ -7,14 +7,9 @@ import static frc.robot.Constants.ClimbConstants.*;
 import static frc.robot.Constants.FuelConstants.*;
 
 public class Dashboard {
-    public final SendableChooser<Alignment> alignmentChooser;
     public Dashboard(){
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
-        alignmentChooser = new SendableChooser<Alignment>();
-        alignmentChooser.addOption("left", Alignment.Left);
-                alignmentChooser.addOption("right", Alignment.Right);
-
-        SmartDashboard.putData("Alignment for tele-op climb", alignmentChooser);
+        
     SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
     }
 }
