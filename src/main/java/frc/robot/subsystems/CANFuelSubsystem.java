@@ -94,7 +94,8 @@ public class CANFuelSubsystem extends SubsystemBase {
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
    System.out.println(distance);
-    return SmartDashboard.getNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
+   // equation from spreadsheet measurements
+    return 723.75*distance+2081;
   }
 
   // A method to spin up the launcher roller while spinning the feeder roller to
