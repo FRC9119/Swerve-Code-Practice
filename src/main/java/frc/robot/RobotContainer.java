@@ -17,6 +17,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import choreo.auto.AutoTrajectory;
 import choreo.Choreo.TrajectoryLogger;
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
@@ -65,14 +66,13 @@ public class RobotContainer {
 
         // Choreo initialization
         private final AutoFactory autoFactory;
-
+        public final AutoChooser autoChooser;
 
         public RobotContainer() {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
                 configureBindings();
-                pickupAndScoreAuto();
 
                 autoFactory = new AutoFactory(
                         () -> drivetrain.getState().Pose, 
@@ -81,7 +81,10 @@ public class RobotContainer {
                         true,
                         drivetrain
                 );
-
+                autoChooser = new AutoChooser();
+                autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
+                SmartDashboard.putData(autoChooser);
+                RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
         }
 
@@ -111,16 +114,16 @@ public class RobotContainer {
 
                 // Put all your trajectories and commands here to create the auton routine
                 // Starting at the event marker named "intake", run the intake 
-                pickupTraj.atTime("intake").onTrue(CANFuelSubsystem.autoIntake());
+                pickupTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
                 // When the trajectory is done, start the next trajectory
                 pickupTraj.done().onTrue(scoreTraj.cmd());
 
                 // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(CANFuelSubsystem.autoShoot());
+                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 // When the trajectory is done, score
-                scoreTraj.done().onTrue(CANFuelSubsystem.autoShoot());
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
 
                 return routine;
 
@@ -188,7 +191,6 @@ public class RobotContainer {
 
                 // reset the field-centric heading on left bumper press
                 joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 
