@@ -9,23 +9,11 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.*;
 
-import javax.lang.model.element.ModuleElement.UsesDirective;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
-import choreo.auto.AutoTrajectory;
-import choreo.Choreo.TrajectoryLogger;
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -35,107 +23,54 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorClimber;
 
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
-                                                                                      // speed
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
-                                                                                          // second
-                                                                                          // max angular velocity
+         // kSpeedAt12Volts desired top speed
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        // 3/4 of a rotation per second max angular velocity
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); 
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
-                                                                                 // motors
+                        // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        // Request to drive and face hub
         private final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
                         .withHeadingPID(10, 0, 0)
+                        // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+        // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
-        public final Dashboard dash = new Dashboard();
 
         private final CommandXboxController joystick = new CommandXboxController(0);
         private final CommandXboxController operatorController = new CommandXboxController(1);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
-        public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
+        public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain);
 
-
-        // Choreo initialization
-        private final AutoFactory autoFactory;
-        public final AutoChooser autoChooser;
+        public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
         public RobotContainer() {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
-                
+                Dashboard.publish();
 
-                autoFactory = new AutoFactory(
-                        () -> drivetrain.getState().Pose, 
-                        drivetrain::resetPose,
-                        drivetrain::followTrajectory,
-                        true,
-                        drivetrain
-                );
-                autoChooser = new AutoChooser();
-                autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
-                SmartDashboard.putData("auto", autoChooser);
-                RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
-configureBindings();
+                configureBindings();
         }
-
-        public double getRadiansBetweenRobotAndHub() {
-                Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                                ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
-                                                .minus(drivetrain.getState().Pose.getTranslation())
-                                : drivetrain.getState().Pose.getTranslation();
-                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
-        }
-
-        // Choreo sample auto routine (from their website)
-        private AutoRoutine pickupAndScoreAuto() {
-                System.out.println("test");
-                AutoRoutine routine = autoFactory.newRoutine("intakeandshoot");
-
-                // Load the routine's trajectories (all of them)
-                AutoTrajectory pickupTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
-
-                // When the routine begins, reset odometry and start the first trajectory 
-                routine.active().onTrue(
-                        Commands.sequence(
-                        pickupTraj.resetOdometry(),
-                        pickupTraj.cmd()
-                        )
-                );
-
-                // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake 
-                pickupTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
-                // When the trajectory is done, start the next trajectory
-                pickupTraj.done().onTrue(scoreTraj.cmd());
-
-                // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
-
-                // When the trajectory is done, score
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
-
-                return routine;
-
-        } 
 
         private void configureBindings() {
+                SwerveRequest driveReq = drive
+                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
+                                drivetrain.applyRequest(() -> driveReq));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -154,20 +89,14 @@ configureBindings();
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT)
                                                 return targetHub.withTargetDirection(
-                                                                new Rotation2d(getRadiansBetweenRobotAndHub()))
+                                                                new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
+                                                                                drivetrain.getState().Pose)))
                                                                 .withVelocityX(-Math.atan(
                                                                                 joystick.getRawAxis(1) * MaxSpeed * .8))
                                                                 .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                                .withDeadband(0.1);
+                                                                                joystick.getRawAxis(0) * MaxSpeed * .8));
                                         else
-                                                return drive
-                                                                .withVelocityX(-Math.atan(
-                                                                                joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                                .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                                .withRotationalRate(-joystick.getRawAxis(2)
-                                                                                * MaxAngularRate);
+                                                return driveReq;
 
                                 }));
 
