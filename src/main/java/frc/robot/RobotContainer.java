@@ -9,23 +9,13 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.*;
 
-import javax.lang.model.element.ModuleElement.UsesDirective;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
-import choreo.auto.AutoTrajectory;
-import choreo.Choreo.TrajectoryLogger;
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -60,28 +50,12 @@ public class RobotContainer {
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
         public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
 
-
-        // Choreo initialization
-        private final AutoFactory autoFactory;
-        public final AutoChooser autoChooser;
+        public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
         public RobotContainer() {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
-                
-
-                autoFactory = new AutoFactory(
-                        () -> drivetrain.getState().Pose, 
-                        drivetrain::resetPose,
-                        drivetrain::followTrajectory,
-                        true,
-                        drivetrain
-                );
-                autoChooser = new AutoChooser();
-                autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
-                SmartDashboard.putData("auto", autoChooser);
-                RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 configureBindings();
         }
 
@@ -93,39 +67,6 @@ configureBindings();
                 return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
 
-        // Choreo sample auto routine (from their website)
-        private AutoRoutine pickupAndScoreAuto() {
-                System.out.println("test");
-                AutoRoutine routine = autoFactory.newRoutine("intakeandshoot");
-
-                // Load the routine's trajectories (all of them)
-                AutoTrajectory pickupTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
-
-                // When the routine begins, reset odometry and start the first trajectory 
-                routine.active().onTrue(
-                        Commands.sequence(
-                        pickupTraj.resetOdometry(),
-                        pickupTraj.cmd()
-                        )
-                );
-
-                // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake 
-                pickupTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
-                // When the trajectory is done, start the next trajectory
-                pickupTraj.done().onTrue(scoreTraj.cmd());
-
-                // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
-
-                // When the trajectory is done, score
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
-
-                return routine;
-
-        } 
 
         private void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
