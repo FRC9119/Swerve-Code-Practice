@@ -62,15 +62,15 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                SwerveRequest driveReq = drive
-                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
-                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
-                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
+                System.out.println(MaxSpeed);
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> driveReq));
+                                drivetrain.applyRequest(() -> drive
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -96,7 +96,9 @@ public class RobotContainer {
                                                                 .withVelocityY(-Math.atan(
                                                                                 joystick.getRawAxis(0) * MaxSpeed * .8));
                                         else
-                                                return driveReq;
+                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
 
                                 }));
 
