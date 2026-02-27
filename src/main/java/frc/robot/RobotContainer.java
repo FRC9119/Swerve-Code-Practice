@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.*;
 
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
@@ -25,30 +23,32 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorClimber;
 
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
-                                                                                      // speed
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
-                                                                                          // second
-                                                                                          // max angular velocity
+         // kSpeedAt12Volts desired top speed
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        // 3/4 of a rotation per second max angular velocity
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); 
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
-                                                                                 // motors
+                        // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        // Request to drive and face hub
         private final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
                         .withHeadingPID(10, 0, 0)
+                        // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+        // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
-        public final Dashboard dash = new Dashboard();
 
         private final CommandXboxController joystick = new CommandXboxController(0);
         private final CommandXboxController operatorController = new CommandXboxController(1);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
-        public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
+        public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain);
 
         public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
@@ -56,21 +56,21 @@ public class RobotContainer {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
-configureBindings();
+                Dashboard.publish();
+
+                configureBindings();
         }
 
-
-
         private void configureBindings() {
-                Supplier<SwerveRequest> driveReq = () -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
+                SwerveRequest driveReq = drive
+                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(driveReq));
+                                drivetrain.applyRequest(() -> driveReq));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -89,14 +89,14 @@ configureBindings();
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT)
                                                 return targetHub.withTargetDirection(
-                                                                new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(drivetrain.getState().Pose)))
+                                                                new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
+                                                                                drivetrain.getState().Pose)))
                                                                 .withVelocityX(-Math.atan(
                                                                                 joystick.getRawAxis(1) * MaxSpeed * .8))
                                                                 .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                                .withDeadband(0.1);
+                                                                                joystick.getRawAxis(0) * MaxSpeed * .8));
                                         else
-                                                return driveReq.get();
+                                                return driveReq;
 
                                 }));
 

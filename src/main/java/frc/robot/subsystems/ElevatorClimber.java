@@ -10,7 +10,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Dashboard;
 
 import static frc.robot.Constants.ClimbConstants.*;
 
@@ -21,7 +20,7 @@ private final CommandSwerveDrivetrain drivetrain;
 private final PIDController alignX = new PIDController(ALIGN_X_KP,0,0);     
       private final  PIDController alignY = new PIDController(ALIGN_Y_KP,0,0);
       private final  PIDController alignTheta = new PIDController(ALIGN_THETA_KP,0,0);
-    public ElevatorClimber(SwerveRequest.FieldCentric drive, CommandSwerveDrivetrain drivetrain, Dashboard dash) {
+    public ElevatorClimber(SwerveRequest.FieldCentric drive, CommandSwerveDrivetrain drivetrain) {
         this.drive = drive;
         this.drivetrain = drivetrain;
         thisWayAndThatWay = new TalonFX(CLIMB_MOTOR_ID);
