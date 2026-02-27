@@ -53,6 +53,16 @@ public class CANFuelSubsystem extends SubsystemBase {
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
+  public static Command autoIntake() {
+    return null;
+    // put auto intake info here
+  }
+
+  public static Command autoShoot() {
+    return null;
+    // put auto shoot info here
+  }
+
   public void unclog() {
     feederRoller.setVoltage(-6);
     intakeRoller

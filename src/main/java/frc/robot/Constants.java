@@ -34,15 +34,25 @@ public final class Constants {
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
   
     // RPMs for shooter
-    public static final double DEFAULT_LAUNCH_RPM = 3400;
+    public static final double DEFAULT_LAUNCH_RPM = 3500;
+    public static final double AT_HUB_LAUNCH_RPM = 2500;
+
     // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = 5;
 
-    public static final boolean USE_SHOOTER_LIMELIGHT = true;
+    // PID controls for rotating bot to shoot
+    public static final double SHOOT_AIM_KP = .01;
+    public static final double SHOOT_AIM_KI = 0;
+    public static final double SHOOT_AIM_KD = 0;
+
+    // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
+    public static final double LIMELIGHT_RPM_KP = .01;
+
+    public static final boolean USE_SHOOTER_LIMELIGHT = false;
 
     // Coordinates are in meters from the right corner on the blue alliance side
-    public static final double HUB_X_COORD = 3.977894; //                            LimelightHelpers.SetRobotOrientation("limelight-shoot",this.getPigeon2().getYaw().getValueAsDouble(),0.0,0.0,0.0,0.0,0.0);
-    public static final double HUB_Y_COORD = 4.0346;
+    public static final double HUB_X_COORD = 4.0346;
+    public static final double HUB_Y_COORD = 4.2655;
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;
 
@@ -59,6 +69,8 @@ public final class Constants {
     public static final double ALIGN_X_KP = 0;
     public static final double ALIGN_Y_KP = 0;
     public static final double ALIGN_THETA_KP = 0;
+
+    public static final boolean USE_CLIMB_LIMEIGHT = false;
 
   }
 

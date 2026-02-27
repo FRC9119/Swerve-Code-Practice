@@ -15,6 +15,11 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
+import choreo.auto.AutoTrajectory;
+import choreo.Choreo.TrajectoryLogger;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -57,11 +62,26 @@ public class RobotContainer {
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
         public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain, dash);
 
+
+        // Choreo initialization
+        private final AutoFactory autoFactory;
+
+
         public RobotContainer() {
                 LimelightHelpers.setupPortForwardingUSB(0);
                 LimelightHelpers.setupPortForwardingUSB(1);
 
                 configureBindings();
+                pickupAndScoreAuto();
+
+                autoFactory = new AutoFactory(
+                        () -> drivetrain.getState().Pose, 
+                        drivetrain::resetPose,
+                        drivetrain::followTrajectory,
+                        true,
+                        drivetrain
+                );
+
 
         }
 
@@ -72,6 +92,39 @@ public class RobotContainer {
                                 : drivetrain.getState().Pose.getTranslation();
                 return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
         }
+
+        // Choreo sample auto routine (from their website)
+        public AutoRoutine pickupAndScoreAuto() {
+                AutoRoutine routine = autoFactory.newRoutine("pickupAndScore");
+
+                // Load the routine's trajectories (all of them)
+                AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+
+                // When the routine begins, reset odometry and start the first trajectory 
+                routine.active().onTrue(
+                        Commands.sequence(
+                        pickupTraj.resetOdometry(),
+                        pickupTraj.cmd()
+                        )
+                );
+
+                // Put all your trajectories and commands here to create the auton routine
+                // Starting at the event marker named "intake", run the intake 
+                pickupTraj.atTime("intake").onTrue(CANFuelSubsystem.autoIntake());
+
+                // When the trajectory is done, start the next trajectory
+                pickupTraj.done().onTrue(scoreTraj.cmd());
+
+                // While the trajectory is active, prepare the scoring subsystem
+                scoreTraj.active().whileTrue(CANFuelSubsystem.autoShoot());
+
+                // When the trajectory is done, score
+                scoreTraj.done().onTrue(CANFuelSubsystem.autoShoot());
+
+                return routine;
+
+        } 
 
         private void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
