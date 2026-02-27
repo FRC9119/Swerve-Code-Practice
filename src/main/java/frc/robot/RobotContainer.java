@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.*;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
@@ -60,14 +62,15 @@ configureBindings();
 
 
         private void configureBindings() {
+                Supplier<SwerveRequest> driveReq = () -> drive
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
+                                drivetrain.applyRequest(driveReq));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -93,13 +96,7 @@ configureBindings();
                                                                                 joystick.getRawAxis(0) * MaxSpeed * .8))
                                                                 .withDeadband(0.1);
                                         else
-                                                return drive
-                                                                .withVelocityX(-Math.atan(
-                                                                                joystick.getRawAxis(1) * MaxSpeed * .8))
-                                                                .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * .8))
-                                                                .withRotationalRate(-joystick.getRawAxis(2)
-                                                                                * MaxAngularRate);
+                                                return driveReq.get();
 
                                 }));
 
