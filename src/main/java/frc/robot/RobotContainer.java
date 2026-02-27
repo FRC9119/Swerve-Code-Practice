@@ -14,8 +14,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -59,13 +57,6 @@ public class RobotContainer {
 configureBindings();
         }
 
-        public double getRadiansBetweenRobotAndHub() {
-                Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                                ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
-                                                .minus(drivetrain.getState().Pose.getTranslation())
-                                : drivetrain.getState().Pose.getTranslation();
-                return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
-        }
 
 
         private void configureBindings() {
@@ -95,7 +86,7 @@ configureBindings();
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT)
                                                 return targetHub.withTargetDirection(
-                                                                new Rotation2d(getRadiansBetweenRobotAndHub()))
+                                                                new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(drivetrain.getState().Pose)))
                                                                 .withVelocityX(-Math.atan(
                                                                                 joystick.getRawAxis(1) * MaxSpeed * .8))
                                                                 .withVelocityY(-Math.atan(
