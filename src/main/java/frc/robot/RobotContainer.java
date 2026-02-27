@@ -42,32 +42,34 @@ public class RobotContainer {
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
         // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
-
+        // Driver Controller
         private final CommandXboxController joystick = new CommandXboxController(0);
+        // Operator Controller
         private final CommandXboxController operatorController = new CommandXboxController(1);
-
+        // Init Subsystems
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
         public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain);
-
+        // Init auto
         public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
         public RobotContainer() {
+                // Make limelight webpage available on roboRIO IP
                 LimelightHelpers.setupPortForwardingUSB(0);
-                LimelightHelpers.setupPortForwardingUSB(1);
-
+                // Publish values to the dashboard
                 Dashboard.publish();
 
                 configureBindings();
         }
 
         private void configureBindings() {
+                // Add joystick controll to swerve request
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
                 SwerveRequest driveReq = drive
                                 .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
                                 .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
-                // Note that X is defined as forward according to WPILib convention,
-                // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> driveReq));
@@ -79,7 +81,7 @@ public class RobotContainer {
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
                 /*
                  * While Y is held AND when constant USE_SHOOTER_LIMELIGHT is true, target hub.
-                 * Otherwise run empty command
+                 * Otherwise run default drive SwerveRequest
                  */
                 // TODO: use ctre brake request
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
@@ -99,13 +101,15 @@ public class RobotContainer {
                                                 return driveReq;
 
                                 }));
-
+                // Run outtake (called eject()) periodically while B is pressed
                 operatorController.b()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
                                                 () -> ballSubsystem.stop()));
+                // Run intake() periodically while X is pressed
                 operatorController.x()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(),
                                                 () -> ballSubsystem.stop()));
+                // Run unclog() periodically while X is pressed
                 operatorController.a()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
@@ -118,6 +122,10 @@ public class RobotContainer {
 
                 // reset the field-centric heading on left bumper press
                 joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                        
+                // zero gyro yaw on right bumper press
+                joystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.getPigeon2().setYaw(0)));
+                // give logs to drivetrain
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 
