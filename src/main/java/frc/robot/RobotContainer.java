@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorClimber;
 
@@ -49,7 +50,7 @@ public class RobotContainer {
         // Init Subsystems
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
-        public final ElevatorClimber climbSubsystem = new ElevatorClimber(drive, drivetrain);
+        public final ClimberInABox climbSubsystem = new ClimberInABox(drivetrain);
         // Init auto
         public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
@@ -115,6 +116,10 @@ public class RobotContainer {
                 operatorController.a()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
+                // TODO: figure out what buttons to map
+                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
+                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
+
                 // Run SysId routines when holding back/start and X/Y.
                 // Note that each routine should be run exactly once in a single log.
                 joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
