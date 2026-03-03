@@ -75,7 +75,8 @@ public class RobotContainer {
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
-                final var idle = new SwerveRequest.Idle();
+                final SwerveRequest.Idle idle = new SwerveRequest.Idle();
+                final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
                 /*
@@ -88,7 +89,9 @@ public class RobotContainer {
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
 
                                 .whileTrue(drivetrain.applyRequest(() -> {
-                                        if (USE_SHOOTER_LIMELIGHT)
+                                        if (USE_SHOOTER_LIMELIGHT){
+                                                //TODO: ask what button this should be
+                                                if(joystick.rightTrigger().getAsBoolean()) return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
@@ -96,6 +99,7 @@ public class RobotContainer {
                                                                                 joystick.getRawAxis(1) * MaxSpeed * .8))
                                                                 .withVelocityY(-Math.atan(
                                                                                 joystick.getRawAxis(0) * MaxSpeed * .8));
+                                        }
                                         else
                                                 return drive
                                                 .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
