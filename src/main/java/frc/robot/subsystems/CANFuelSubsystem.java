@@ -33,7 +33,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // all methods in this subsystem pull their values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
-    
+
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
 
@@ -89,7 +89,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller.set(0);
     intakeRoller.set(0);
   }
-
 
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher

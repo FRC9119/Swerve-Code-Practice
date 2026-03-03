@@ -10,26 +10,28 @@ import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class Auto {
-    
+
         // Choreo initialization
         private final AutoFactory autoFactory;
         public final AutoChooser autoChooser;
         private final CANFuelSubsystem ballSubsystem;
 
-    public Auto (CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem){
-        this.ballSubsystem = ballSubsystem;
-        autoFactory = new AutoFactory(
-                        () -> drivetrain.getState().Pose, 
-                        drivetrain::resetPose,
-                        drivetrain::followTrajectory,
-                        true,
-                        drivetrain
-                );
+        public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem) {
+                // Set the local ballSubsystem to the ballSubsystem passed into the constructor (from RobotContainer)
+                this.ballSubsystem = ballSubsystem;
+                // Init Choreo's autoFactory
+                autoFactory = new AutoFactory(
+                                () -> drivetrain.getState().Pose,
+                                drivetrain::resetPose,
+                                drivetrain::followTrajectory,
+                                true,
+                                drivetrain);
+                // Make autoChooser and add it to dashboard
                 autoChooser = new AutoChooser();
                 autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
                 SmartDashboard.putData("auto", autoChooser);
-    }
-    
+        }
+
         // Choreo sample auto routine (from their website)
         private AutoRoutine pickupAndScoreAuto() {
                 System.out.println("test");
@@ -39,16 +41,14 @@ public class Auto {
                 AutoTrajectory pickupTraj = routine.trajectory("intakeFromLeft");
                 AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
 
-                // When the routine begins, reset odometry and start the first trajectory 
+                // When the routine begins, reset odometry and start the first trajectory
                 routine.active().onTrue(
-                        Commands.sequence(
-                        pickupTraj.resetOdometry(),
-                        pickupTraj.cmd()
-                        )
-                );
+                                Commands.sequence(
+                                                pickupTraj.resetOdometry(),
+                                                pickupTraj.cmd()));
 
                 // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake 
+                // Starting at the event marker named "intake", run the intake
                 pickupTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
                 // When the trajectory is done, start the next trajectory
@@ -62,5 +62,5 @@ public class Auto {
 
                 return routine;
 
-        } 
+        }
 }
