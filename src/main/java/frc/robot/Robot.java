@@ -13,27 +13,28 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-
   public Robot() {
     m_robotContainer = new RobotContainer();
     m_robotContainer.drivetrain.getPigeon2().setYaw(180);
-
 
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run(); 
-    }
+    CommandScheduler.getInstance().run();
+  }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
@@ -43,7 +44,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    
+
   }
 
   @Override
@@ -63,7 +64,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -71,11 +73,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }
