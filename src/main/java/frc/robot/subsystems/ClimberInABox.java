@@ -17,8 +17,8 @@ import static frc.robot.Constants.ClimbConstants.*;
 public class ClimberInABox extends SubsystemBase {
     private final TalonFX kraken;
     private final CommandSwerveDrivetrain drivetrain;
-    private final PIDController alignX = new PIDController(ALIGN_X_KP, 0, 0);
-    private final PIDController alignY = new PIDController(ALIGN_Y_KP, 0, 0);
+    private final PIDController alignX = new PIDController(ALIGN_XY_KP, 0, 0);
+    private final PIDController alignY = new PIDController(ALIGN_XY_KP, 0, 0);
 
     public ClimberInABox(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -47,7 +47,7 @@ public class ClimberInABox extends SubsystemBase {
             double yVelocity = alignY.calculate(currentPosition.getY(), goalPosition.getY());
             // Start and configure swerve request
             SwerveRequest.FieldCentricFacingAngle alignRequest = new SwerveRequest.FieldCentricFacingAngle()
-                    .withHeadingPID(10, 0, 0).withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                    .withHeadingPID(ROTATION_KP, 0, 0).withDriveRequestType(DriveRequestType.OpenLoopVoltage)
                     .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
                     // Give request goal rotation, and calculated velocities
                     .withTargetDirection(goalPosition.getRotation()).withVelocityX(xVelocity).withVelocityY(yVelocity);
