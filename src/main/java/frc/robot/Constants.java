@@ -48,7 +48,7 @@ public final class Constants {
     // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
     public static final double LIMELIGHT_RPM_KP = .01;
 
-    public static final boolean USE_SHOOTER_LIMELIGHT = false;
+    public static final boolean USE_SHOOTER_LIMELIGHT = true;
 
     // Coordinates are in meters from the right corner on the blue alliance side
     public static final double HUB_X_COORD = 4.0346;
