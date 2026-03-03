@@ -44,7 +44,6 @@ public class ElevatorClimber extends SubsystemBase{
 //         alignX.setSetpoint(goalPosition.getX());
 //         alignY.setSetpoint(goalPosition.getY());
 //         alignTheta.setSetpoint(goalPosition.getRotation().getRadians());
-//         // TODO: change this to CTRE FieldCentricFacingAngle
 //         drivetrain.applyRequest(() -> drive.withVelocityX(alignX.calculate(currentPosition.getX())).withVelocityY(currentPosition.getY()).withRotationalRate(currentPosition.getRotation().getRadians()));
 //     });
     
