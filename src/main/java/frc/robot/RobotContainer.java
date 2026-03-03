@@ -119,7 +119,7 @@ public class RobotContainer {
                 // TODO: figure out what buttons to map
                 operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
                 operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
-
+                
                 // Run SysId routines when holding back/start and X/Y.
                 // Note that each routine should be run exactly once in a single log.
                 joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
