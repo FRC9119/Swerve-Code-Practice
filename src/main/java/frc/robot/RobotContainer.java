@@ -7,7 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.FuelConstants.*;
+import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -64,15 +64,14 @@ public class RobotContainer {
 
         private void configureBindings() {
                 // Add joystick controll to swerve request
-                // Note that X is defined as forward according to WPILib convention,
+               // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
-                SwerveRequest driveReq = drive
-                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
-                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
-                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> driveReq));
+                                drivetrain.applyRequest(() -> drive
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -98,7 +97,10 @@ public class RobotContainer {
                                                                 .withVelocityY(-Math.atan(
                                                                                 joystick.getRawAxis(0) * MaxSpeed * .8));
                                         else
-                                                return driveReq;
+                                                return drive
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed * .8))
+                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
 
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
