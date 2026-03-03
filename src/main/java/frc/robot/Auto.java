@@ -17,13 +17,16 @@ public class Auto {
         private final CANFuelSubsystem ballSubsystem;
 
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem) {
+                // Set the local ballSubsystem to the ballSubsystem passed into the constructor (from RobotContainer)
                 this.ballSubsystem = ballSubsystem;
+                // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
                                 drivetrain::resetPose,
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
+                // Make autoChooser and add it to dashboard
                 autoChooser = new AutoChooser();
                 autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
                 SmartDashboard.putData("auto", autoChooser);

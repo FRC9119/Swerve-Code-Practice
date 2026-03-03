@@ -6,6 +6,7 @@ import static frc.robot.Constants.FuelConstants.*;
 
 public class Dashboard {
     public static void publish() {
+        // Put a bunch of constants onto the dashboard
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
         SmartDashboard.putNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE);
         SmartDashboard.putNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);

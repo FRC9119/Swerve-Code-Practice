@@ -65,11 +65,11 @@ public final class Constants {
     public static final int MAX_CLIMB_CURRENT = 60;
     // Time for motor to rotate in one direction, in seconds
     public static final long CLIMB_CYCLE_TIME = 3;
-
+    // PID constants for lining up the robot with the tower
     public static final double ALIGN_XY_KP = 0;
     public static final double ROTATION_KP = 0;
-
-    public static final boolean USE_CLIMB_LIMEIGHT = false;
+    // Whether to use auto-alignment
+    public static final boolean USE_CLIMB_ALIGNMENT = false;
 
   }
 

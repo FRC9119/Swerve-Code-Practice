@@ -14,10 +14,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class Targeting {
 
   public static double getRadiansBetweenRobotAndHub(Pose2d pose) {
+    // Change pose as if you were on blue alliance, because we use the coordinates of the blue hub
     Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
             .minus(pose.getTranslation())
         : pose.getTranslation();
+    // Calculate angle using inverse tangent
     return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
   }
 
