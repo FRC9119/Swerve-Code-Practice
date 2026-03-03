@@ -21,7 +21,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorClimber;
 
 public class RobotContainer {
          // kSpeedAt12Volts desired top speed
