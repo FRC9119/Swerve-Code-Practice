@@ -91,7 +91,7 @@ public class RobotContainer {
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT){
                                                 //TODO: ask what button this should be
-                                                if(joystick.rightTrigger().getAsBoolean()) return brake;
+                                                if(joystick.x().getAsBoolean()) return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
@@ -119,8 +119,9 @@ public class RobotContainer {
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
                 // TODO: figure out what buttons to map
-                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
-                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
+             
+                operatorController.povUp().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
+                operatorController.povDown().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
                 
                 // Run SysId routines when holding back/start and X/Y.
                 // Note that each routine should be run exactly once in a single log.
