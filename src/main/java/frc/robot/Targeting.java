@@ -11,10 +11,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
+// This is just a class that has helpful methods for targeting the hub.
+// There is no need to instantiate this class because everything is static (meaning it never changes based on variables in the class)
 public class Targeting {
 
   public static double getRadiansBetweenRobotAndHub(Pose2d pose) {
-    // Change pose as if you were on blue alliance, because we use the coordinates of the blue hub
+    // Change pose as if you were on blue alliance, because we use the coordinates
+    // of the blue hub
     Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
             .minus(pose.getTranslation())
