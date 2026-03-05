@@ -28,31 +28,30 @@ public class Auto {
                                 drivetrain);
                 // Make autoChooser and add it to dashboard
                 autoChooser = new AutoChooser();
-                autoChooser.addRoutine("Intake and shoot", this::pickupAndScoreAuto);
+                autoChooser.addRoutine("Intake and shoot", this::leftIntakeShoot);
                 SmartDashboard.putData("auto", autoChooser);
         }
 
         // Choreo sample auto routine (from their website)
-        private AutoRoutine pickupAndScoreAuto() {
-                System.out.println("test");
+        private AutoRoutine leftIntakeShoot() {
                 AutoRoutine routine = autoFactory.newRoutine("intakeandshoot");
 
                 // Load the routine's trajectories (all of them)
-                AutoTrajectory pickupTraj = routine.trajectory("intakeFromLeft");
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
                 AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
 
                 // When the routine begins, reset odometry and start the first trajectory
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                pickupTraj.resetOdometry(),
-                                                pickupTraj.cmd()));
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
 
                 // Put all your trajectories and commands here to create the auton routine
                 // Starting at the event marker named "intake", run the intake
-                pickupTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
                 // When the trajectory is done, start the next trajectory
-                pickupTraj.done().onTrue(scoreTraj.cmd());
+                intakeTraj.done().onTrue(scoreTraj.cmd());
 
                 // While the trajectory is active, prepare the scoring subsystem
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
