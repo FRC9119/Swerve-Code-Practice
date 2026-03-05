@@ -51,7 +51,7 @@ public class RobotContainer {
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
         public final ClimberInABox climbSubsystem = new ClimberInABox(drivetrain);
         // Init auto
-        public final Auto auto = new Auto(drivetrain, ballSubsystem);
+        public final Auto auto = new Auto(drivetrain, ballSubsystem, climbSubsystem);
 
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
