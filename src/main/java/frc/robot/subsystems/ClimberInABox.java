@@ -65,6 +65,9 @@ public class ClimberInABox extends SubsystemBase {
     public void climb() {
         kraken.set(1);
     }
+    public Command climbCommand(){
+       return this.run(() -> this.climb());
+    }
 
     public void release() {
         kraken.set(-.5);
