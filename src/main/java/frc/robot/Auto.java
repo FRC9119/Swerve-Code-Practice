@@ -21,8 +21,8 @@ public class Auto {
         private final ClimberInABox climbSubsystem;
 
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem, ClimberInABox climbSubsystem) {
-                // Set the local ballSubsystem to the ballSubsystem passed into the constructor
-                // (from RobotContainer)
+                // Set the local subsystem to the subsystems passed into the constructor
+                // (real instances from RobotContainer)
                 this.ballSubsystem = ballSubsystem;
                 this.climbSubsystem = climbSubsystem;
                 // Init Choreo's autoFactory
@@ -32,8 +32,9 @@ public class Auto {
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
-                // Make autoChooser and add it to dashboard
+                // Make autoChooser with all autos and add it to dashboard
                 autoChooser = new AutoChooser();
+
                 autoChooser.addRoutine("Intake, shoot (from left)", this::leftIntakeShoot);
                 autoChooser.addRoutine("Intake, shoot (from right)", this::rightIntakeShoot);
                 autoChooser.addRoutine("Intake, shoot, climb (from left)", this::leftIntakeShootClimb);
@@ -45,67 +46,11 @@ public class Auto {
                 SmartDashboard.putData("auto", autoChooser);
         }
 
-        private AutoRoutine leftIntakeShoot() {
-                AutoRoutine routine = autoFactory.newRoutine("leftIntakeShoot");
-
-                // Load the routine's trajectories (all of them)
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
-
-                // When the routine begins, reset odometry and start the first trajectory
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
-                // When the trajectory is done, start the next trajectory
-                intakeTraj.done().onTrue(scoreTraj.cmd());
-
-                // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
-
-                // When the trajectory is done, score
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
-
-                return routine;
-
-        }
-
-        private AutoRoutine rightIntakeShoot() {
-                AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
-
-                // Load the routine's trajectories (all of them)
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
-
-                // When the routine begins, reset odometry and start the first trajectory
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
-                // When the trajectory is done, start the next trajectory
-                intakeTraj.done().onTrue(scoreTraj.cmd());
-
-                // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
-
-                // When the trajectory is done, score
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
-
-                return routine;
-
-        }
-
+        // Use this auto as a reference
+        // This function defines a routine and then returns it
+        // It's a generator
         private AutoRoutine leftIntakeShootClimb() {
+                // Initialize the routine with name
                 AutoRoutine routine = autoFactory.newRoutine("leftIntakeShootClimb");
 
                 // Load the routine's trajectories (all of them)
@@ -119,7 +64,6 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                // Put all your trajectories and commands here to create the auton routine
                 // Starting at the event marker named "intake", run the intake
                 intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
@@ -130,9 +74,13 @@ public class Auto {
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 // When the trajectory is done, score
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(3).andThen(climbTraj.cmd()));
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand()
+                                // After 3 seconds, stop scoring and start the climb trajectory
+                                .withTimeout(3).andThen(climbTraj.cmd()));
+                // When we arrive at the climbing position, climb
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
+                // Return the finished routine
                 return routine;
 
         }
@@ -140,30 +88,69 @@ public class Auto {
         private AutoRoutine rightIntakeShootClimb() {
                 AutoRoutine routine = autoFactory.newRoutine("rightIntakeShootClimb");
 
-                // Load the routine's trajectories (all of them)
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
                 AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
                 AutoTrajectory climbTraj = routine.trajectory("climbAfterRightScore");
 
-                // When the routine begins, reset odometry and start the first trajectory
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                // Put all your trajectories and commands here to create the auton routine
-                // Starting at the event marker named "intake", run the intake
                 intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
-                // When the trajectory is done, start the next trajectory
                 intakeTraj.done().onTrue(scoreTraj.cmd());
 
-                // While the trajectory is active, prepare the scoring subsystem
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
-                // When the trajectory is done, score
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(3).andThen(climbTraj.cmd()));
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
+
+                return routine;
+
+        }
+
+        private AutoRoutine leftIntakeShoot() {
+                AutoRoutine routine = autoFactory.newRoutine("leftIntakeShoot");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+
+                intakeTraj.done().onTrue(scoreTraj.cmd());
+
+                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
+
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
+
+                return routine;
+
+        }
+
+        private AutoRoutine rightIntakeShoot() {
+                AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+
+                intakeTraj.done().onTrue(scoreTraj.cmd());
+
+                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
+
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
 
                 return routine;
 
