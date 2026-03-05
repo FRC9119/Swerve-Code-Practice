@@ -14,7 +14,7 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"3.6445767879486084 m", "val":3.644576787948608}, "y":{"exp":"7.41393518447876 m", "val":7.41393518447876}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"startLeftTrench.x", "val":3.644576787948608}, "y":{"exp":"startLeftTrench.y", "val":7.41393518447876}, "heading":{"exp":"startLeftTrench.heading", "val":0.0}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"7.781484127044678 m", "val":7.781484127044678}, "y":{"exp":"6.860258102416992 m", "val":6.860258102416992}, "heading":{"exp":"270 deg", "val":4.71238898038469}, "intervals":10, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"afterLeftIntake.x", "val":7.802378177642822}, "y":{"exp":"afterLeftIntake.y", "val":5.24101448059082}, "heading":{"exp":"afterLeftIntake.heading", "val":4.71238898038469}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
@@ -89,5 +89,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"intake", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"intake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
