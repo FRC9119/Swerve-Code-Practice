@@ -29,16 +29,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID);
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
-    // put default values for various fuel operations onto the dashboard
-    // all methods in this subsystem pull their values from the dashbaord to allow
-    // you to tune the values easily, and then replace the values in Constants.java
-    // with your new values. For more information, see the Software Guide.
-
+    // create config for feeder CIM and apply it
     TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
     feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
-
+    feederRoller.configAllSettings(feederConfig);
+    // Create bang-bang controller and add a setpoint (goal)
     launchBang = new BangBangController();
     launchBang.setSetpoint(DEFAULT_LAUNCH_RPM);
+    // Add tolerance (amount of error that is still considered correct)
     launchBang.setTolerance(LAUNCH_TOLERANCE);
   }
 
@@ -49,16 +47,7 @@ public class CANFuelSubsystem extends SubsystemBase {
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
-  public static Command autoIntake() {
-    return null;
-    // put auto intake info here
-  }
-
-  public static Command autoShoot() {
-    return null;
-    // put auto shoot info here
-  }
-
+  // Method to unclog the shooter just in case a fuel is stuck
   public void unclog() {
     feederRoller.setVoltage(-6);
     intakeRoller
@@ -99,8 +88,7 @@ public class CANFuelSubsystem extends SubsystemBase {
         .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
   }
 
-  // A command factory to turn the spinUp method into a command that requires this
-  // subsystem
+  // Command factories to turn the spinUp method into a command that requires this subsystem
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
@@ -109,8 +97,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     return this.run(() -> intake());
   }
 
-  // A command factory to turn the launch method into a command that requires this
-  // subsystem
   public Command launchCommand() {
     return this.run(() -> launch());
   }
