@@ -31,12 +31,12 @@ public class Auto {
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
                                 (Pose2d pose) -> {
-                                        System.out.println(drivetrain.getState().Pose);
+                                        
                                         drivetrain.resetPose(pose);
-                                        System.out.println(drivetrain.getState().Pose);
+                                        
                                         drivetrain.getPigeon2().setYaw(0);
                                         drivetrain.resetPose(pose);
-                                        System.out.println(drivetrain.getState().Pose);
+                                        
 
                                 },
                                 drivetrain::followTrajectory,
@@ -131,6 +131,14 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+
+                intakeTraj.done().onTrue(scoreTraj.cmd());
+
+                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
+
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
+
                 return routine;
 
         }
@@ -164,6 +172,7 @@ public class Auto {
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 routine.active().onTrue(
                                 Commands.sequence(
+                                                ballSubsystem.spinUpCommand(),
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand());

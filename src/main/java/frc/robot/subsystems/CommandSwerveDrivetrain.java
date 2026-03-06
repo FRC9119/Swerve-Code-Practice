@@ -35,8 +35,8 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private final PIDController xController = new PIDController(2.5, 0.0, 0);
-    private final PIDController yController = new PIDController(2.5, 0.0, 0);
+    private final PIDController xController = new PIDController(7.5, 0.0, 0);
+    private final PIDController yController = new PIDController(7.5, 0.0, 0);
     private final PIDController headingController = new PIDController(10, 0.0, 0.0);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
@@ -236,7 +236,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             sample.vy + yController.calculate(pose.getY(), sample.y),
             sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
-
+        
         // Apply the generated speeds
         this.setControl(m_pathApplyFieldSpeeds.withSpeeds(speeds));
     }
