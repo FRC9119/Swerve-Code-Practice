@@ -10,12 +10,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -69,8 +72,8 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed))
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed))
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed*.8)
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed*.8)
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
@@ -91,7 +94,7 @@ public class RobotContainer {
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT){
                                                 //TODO: ask what button this should be
-                                                if(joystick.rightTrigger().getAsBoolean()) return brake;
+                                                if(joystick.x().getAsBoolean()) return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
@@ -119,8 +122,9 @@ public class RobotContainer {
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
                 // TODO: figure out what buttons to map
-                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
-                operatorController.button(0).whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
+             
+                operatorController.povUp().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
+                operatorController.povDown().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
                 
                 // Run SysId routines when holding back/start and X/Y.
                 // Note that each routine should be run exactly once in a single log.
@@ -128,7 +132,15 @@ public class RobotContainer {
                 joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
                 joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
                 joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                
+// SysId bindings (ONLY FOR TESTING)
+joystick.povUp().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+joystick.povDown().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+joystick.povLeft().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
+operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
                 // reset the field-centric heading on left bumper press
                 joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
                         

@@ -258,8 +258,11 @@ System.out.println("in followTraj");
             });
         }
         boolean rotatingTooFast = Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 10;
-        if(!rotatingTooFast){                         
-            LimelightHelpers.SetRobotOrientation("limelight-shoot",this.getPigeon2().getYaw().getValueAsDouble(),0.0,0.0,0.0,0.0,0.0);
+        if(!rotatingTooFast){
+            double yaw = this.getPigeon2().getYaw().getValueAsDouble();
+            boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;              
+            LimelightHelpers.SetRobotOrientation("limelight-shoot",
+            isRed ? 180 + yaw : yaw,0.0,0.0,0.0,0.0,0.0);
             LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
 
             if(mt2.tagCount != 0){
