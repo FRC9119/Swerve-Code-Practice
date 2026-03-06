@@ -30,15 +30,7 @@ public class Auto {
                 // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
-                                (Pose2d pose) -> {
-                                        
-                                        drivetrain.resetPose(pose);
-                                        
-                                        drivetrain.getPigeon2().setYaw(0);
-                                        drivetrain.resetPose(pose);
-                                        
-
-                                },
+                                drivetrain::resetPose,
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
@@ -170,30 +162,44 @@ public class Auto {
                 AutoRoutine routine = autoFactory.newRoutine("centerShoot");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
+
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                ballSubsystem.spinUpCommand(),
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
+                                                scoreTraj.cmd(),
+                                                ballSubsystem.spinUpCommand()));
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand());
 
                 return routine;
 
         }
 
+        // Use this as another complex example
         private AutoRoutine centerShootClimbLeft() {
+                // create routine and name it
                 AutoRoutine routine = autoFactory.newRoutine("centerShootClimbLeft");
 
+                // load all trajectories
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 AutoTrajectory climbTraj = routine.trajectory("climbLeftFromCenter");
+                // on start, set robot position, start trajectory, and get the shooter up to
+                // speed
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                ballSubsystem.spinUpCommand(),
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(3).andThen(climbTraj.cmd()));
-
-                climbTraj.done().onTrue(climbSubsystem.climbCommand());
+                                                scoreTraj.cmd(),
+                                                ballSubsystem.spinUpCommand()));
+                // after first trajectory
+                scoreTraj.done().onTrue(
+                                // stay still until launcher is up to speed
+                                Commands.waitUntil(() -> ballSubsystem.launchBang.atSetpoint())
+                                                // then launch for three seconds
+                                                .andThen(ballSubsystem.launchCommand()
+                                                                .withTimeout(3)
+                                                                // start next trajectory afterwards
+                                                                .andThen(climbTraj.cmd())));
+                // once in position, climb for the amount of time specified in Constants.java
+                climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
                 return routine;
         }
@@ -205,12 +211,16 @@ public class Auto {
                 AutoTrajectory climbTraj = routine.trajectory("climbRightFromCenter");
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                ballSubsystem.spinUpCommand(),
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(3).andThen(climbTraj.cmd()));
+                                                scoreTraj.cmd(),
+                                                ballSubsystem.spinUpCommand()));
+                scoreTraj.done().onTrue(
+                                Commands.waitUntil(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()
+                                                                .withTimeout(3)
+                                                                .andThen(climbTraj.cmd())));
 
-                climbTraj.done().onTrue(climbSubsystem.climbCommand());
+                climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
                 return routine;
         }
