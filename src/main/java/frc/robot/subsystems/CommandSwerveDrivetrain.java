@@ -42,7 +42,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 /** Swerve request to apply during robot-centric path following */
-    private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+    private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -230,17 +230,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = this.getState().Pose;
-        int color = 1;
-        if(DriverStation.getAlliance().get() == Alliance.Red) color = -1;
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
-            color * (sample.vx + xController.calculate(pose.getX(), sample.x)),
-            color * (sample.vy + yController.calculate(pose.getY(), sample.y)),
-            color * sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
         // Apply the generated speeds
-        this.setControl(m_pathApplyRobotSpeeds.withSpeeds(speeds));
+        this.setControl(m_pathApplyFieldSpeeds.withSpeeds(speeds));
     }
 
     @Override

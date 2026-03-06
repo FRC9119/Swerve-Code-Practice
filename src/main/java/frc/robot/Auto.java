@@ -6,6 +6,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,9 +31,12 @@ public class Auto {
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
                                 (Pose2d pose) -> {
+                                        System.out.println(drivetrain.getState().Pose);
                                         drivetrain.resetPose(pose);
-                                        drivetrain.getPigeon2().setYaw(pose.getRotation().getDegrees());
-                                drivetrain.resetPose(pose);
+                                        System.out.println(drivetrain.getState().Pose);
+                                        drivetrain.getPigeon2().setYaw(0);
+                                        drivetrain.resetPose(pose);
+                                        System.out.println(drivetrain.getState().Pose);
 
                                 },
                                 drivetrain::followTrajectory,
@@ -126,8 +130,6 @@ public class Auto {
                                 Commands.sequence(
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
-
-               
 
                 return routine;
 
