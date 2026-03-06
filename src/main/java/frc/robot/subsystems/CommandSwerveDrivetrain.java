@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 
 import java.util.function.Supplier;
 
@@ -34,8 +35,8 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private final PIDController xController = new PIDController(3, 0.0, 1.3);
-    private final PIDController yController = new PIDController(3, 0.0, 1.3);
+    private final PIDController xController = new PIDController(2.5, 0.0, 0);
+    private final PIDController yController = new PIDController(2.5, 0.0, 0);
     private final PIDController headingController = new PIDController(10, 0.0, 0.0);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
@@ -229,12 +230,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = this.getState().Pose;
-System.out.println("in followTraj");
+        int color = 1;
+        if(DriverStation.getAlliance().get() == Alliance.Red) color = -1;
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
-            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            color * (sample.vx + xController.calculate(pose.getX(), sample.x)),
+            color * (sample.vy + yController.calculate(pose.getY(), sample.y)),
+            color * sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
         // Apply the generated speeds
@@ -261,7 +263,7 @@ System.out.println("in followTraj");
             });
         }
         boolean rotatingTooFast = Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 10;
-        if(!rotatingTooFast){
+        if(!rotatingTooFast && USE_SHOOTER_LIMELIGHT && DriverStation.getAlliance().isPresent()){
             double yaw = this.getPigeon2().getYaw().getValueAsDouble();
             boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;              
             LimelightHelpers.SetRobotOrientation("limelight-shoot",
