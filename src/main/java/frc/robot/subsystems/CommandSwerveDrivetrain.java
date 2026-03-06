@@ -34,9 +34,9 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+    private final PIDController xController = new PIDController(3, 0.0, 1.3);
+    private final PIDController yController = new PIDController(3, 0.0, 1.3);
+    private final PIDController headingController = new PIDController(10, 0.0, 0.0);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -133,7 +133,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super(drivetrainConstants, modules);
         if (Utils.isSimulation()) {
             startSimThread();
-        }        
+        }
+        headingController.enableContinuousInput(-Math.PI, Math.PI);        
     }
 
     /**
@@ -158,6 +159,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+                headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /**
@@ -190,6 +192,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+                headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /**

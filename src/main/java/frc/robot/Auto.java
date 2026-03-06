@@ -121,13 +121,7 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
-                intakeTraj.done().onTrue(scoreTraj.cmd());
-
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
-
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
+               
 
                 return routine;
 
