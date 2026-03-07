@@ -1,6 +1,8 @@
 package frc.robot;
 
 import static frc.robot.Constants.ClimbConstants.CLIMB_CYCLE_TIME;
+import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_8;
+
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -79,8 +81,8 @@ public class Auto {
 
                 // When the trajectory is done, score
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand()
-                                // After 3 seconds, stop scoring and start the climb trajectory
-                                .withTimeout(3).andThen(climbTraj.cmd()));
+                                // After TIME_TO_LAUNCH_8 seconds, stop scoring and start the climb trajectory
+                                .withTimeout(TIME_TO_LAUNCH_8).andThen(climbTraj.cmd()));
                 // When we arrive at the climbing position, climb
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
@@ -107,7 +109,7 @@ public class Auto {
 
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(3).andThen(climbTraj.cmd()));
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8).andThen(climbTraj.cmd()));
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
                 return routine;
@@ -197,7 +199,7 @@ public class Auto {
                                 ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 // then launch for three seconds
                                                 .andThen(ballSubsystem.launchCommand()
-                                                                .withTimeout(3)
+                                                                .withTimeout(TIME_TO_LAUNCH_8)
                                                                 // start next trajectory afterwards
                                                                 .andThen(climbTraj.cmd())));
                 // once in position, climb for the amount of time specified in Constants.java
@@ -219,7 +221,7 @@ public class Auto {
                 scoreTraj.done().onTrue(
                                 ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()
-                                                                .withTimeout(3)
+                                                                .withTimeout(TIME_TO_LAUNCH_8)
                                                                 .andThen(climbTraj.cmd())));
 
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
