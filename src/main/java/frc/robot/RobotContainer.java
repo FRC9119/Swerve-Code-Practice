@@ -15,6 +15,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -145,7 +147,12 @@ public class RobotContainer {
                 joystick.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
                 // zero gyro yaw on right bumper press
-                joystick.R1().onTrue(drivetrain.runOnce(() -> drivetrain.getPigeon2().setYaw(0)));
+                joystick.R1().onTrue(drivetrain.runOnce(() -> 
+                // get alliance and make sure it exists
+                DriverStation.getAlliance().ifPresent((alliance) -> 
+                // set gyro to 0 if blue, 180 if red
+                drivetrain.getPigeon2().setYaw(alliance == Alliance.Blue ? 0 : 180)
+                )));
                 // give logs to drivetrain
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
