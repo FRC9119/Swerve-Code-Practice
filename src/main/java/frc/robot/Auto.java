@@ -190,7 +190,7 @@ public class Auto {
                 // after first trajectory
                 scoreTraj.done().onTrue(
                                 // stay still until launcher is up to speed
-                                Commands.waitUntil(() -> ballSubsystem.launchBang.atSetpoint())
+                                ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 // then launch for three seconds
                                                 .andThen(ballSubsystem.launchCommand()
                                                                 .withTimeout(3)
@@ -213,7 +213,7 @@ public class Auto {
                                                 scoreTraj.cmd(),
                                                 ballSubsystem.spinUpCommand()));
                 scoreTraj.done().onTrue(
-                                Commands.waitUntil(() -> ballSubsystem.launchBang.atSetpoint())
+                                ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()
                                                                 .withTimeout(3)
                                                                 .andThen(climbTraj.cmd())));
