@@ -16,6 +16,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -46,7 +47,7 @@ public class RobotContainer {
         // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
         // Driver Controller
-        private final CommandXboxController joystick = new CommandXboxController(0);
+        private final CommandPS5Controller joystick = new CommandPS5Controller(0);
         // Operator Controller
         private final CommandXboxController operatorController = new CommandXboxController(1);
         // Init Subsystems
@@ -66,7 +67,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                double speedScalar = MaxSpeed * (SPEED_SCALAR +joystick.getRightTriggerAxis()*(1-SPEED_SCALAR));
+                double speedScalar = MaxSpeed * (SPEED_SCALAR +joystick.getR2Axis()*(1-SPEED_SCALAR));
                 // Add joystick controll to swerve request
                // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
@@ -87,14 +88,13 @@ public class RobotContainer {
                  * While Y is held AND when constant USE_SHOOTER_LIMELIGHT is true, target hub.
                  * Otherwise run default drive SwerveRequest
                  */
-                // TODO: use ctre brake request
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
                                 .until(() -> ballSubsystem.launchBang.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
                                 
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT){
-                                                if(joystick.x().getAsBoolean()) return brake;
+                                                if(joystick.cross().getAsBoolean()) return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
@@ -121,17 +121,16 @@ public class RobotContainer {
                 operatorController.a()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
-                // TODO: figure out what buttons to map
-             
+                // climb while d-pad up is pressed, come back down while d-pad down is pressed
                 operatorController.povUp().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
                 operatorController.povDown().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
                 
-                // Run SysId routines when holding back/start and X/Y.
+                // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log.
-                joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                joystick.povUp().and(joystick.circle()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                joystick.povDown().and(joystick.circle()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                joystick.povLeft().and(joystick.circle()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                joystick.povRight().and(joystick.circle()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
                 
 // SysId bindings (ONLY FOR TESTING)
 joystick.povUp().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
@@ -142,10 +141,10 @@ joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction
 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
                 // reset the field-centric heading on left bumper press
-                joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                joystick.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
                         
                 // zero gyro yaw on right bumper press
-                joystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.getPigeon2().setYaw(0)));
+                joystick.R1().onTrue(drivetrain.runOnce(() -> drivetrain.getPigeon2().setYaw(0)));
                 // give logs to drivetrain
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
