@@ -66,14 +66,15 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
+                double speedScalar = MaxSpeed * (SPEED_SCALAR +joystick.getRightTriggerAxis()*(1-SPEED_SCALAR));
                 // Add joystick controll to swerve request
                // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed * SPEED_SCALAR)
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed * SPEED_SCALAR)
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * speedScalar)
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * speedScalar)
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
@@ -90,10 +91,9 @@ public class RobotContainer {
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
                                 .until(() -> ballSubsystem.launchBang.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
-
+                                
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT){
-                                                //TODO: ask what button this should be
                                                 if(joystick.x().getAsBoolean()) return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
