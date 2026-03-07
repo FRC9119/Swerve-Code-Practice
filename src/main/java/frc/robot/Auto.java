@@ -73,8 +73,8 @@ public class Auto {
                 // Starting at the event marker named "intake", run the intake
                 intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
-                // When the trajectory is done, start the next trajectory
-                intakeTraj.done().onTrue(scoreTraj.cmd());
+                // When the trajectory is done, start the next trajectory and at the same time, raise the climb arm up
+                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
 
                 // While the trajectory is active, prepare the scoring subsystem
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
@@ -105,7 +105,7 @@ public class Auto {
 
                 intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
 
-                intakeTraj.done().onTrue(scoreTraj.cmd());
+                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
 
                 scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
@@ -195,13 +195,15 @@ public class Auto {
                                                 ballSubsystem.spinUpCommand()));
                 // after first trajectory
                 scoreTraj.done().onTrue(
-                                // stay still until launcher is up to speed
+                        // put climb arm up
+                                Commands.parallel( climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
+                                // at the same time, stay still until launcher is up to speed
                                 ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 // then launch for three seconds
                                                 .andThen(ballSubsystem.launchCommand()
                                                                 .withTimeout(TIME_TO_LAUNCH_8)
                                                                 // start next trajectory afterwards
-                                                                .andThen(climbTraj.cmd())));
+                                                                .andThen(climbTraj.cmd()))));
                 // once in position, climb for the amount of time specified in Constants.java
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
@@ -219,10 +221,11 @@ public class Auto {
                                                 scoreTraj.cmd(),
                                                 ballSubsystem.spinUpCommand()));
                 scoreTraj.done().onTrue(
+                                Commands.parallel(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
                                 ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()
                                                                 .withTimeout(TIME_TO_LAUNCH_8)
-                                                                .andThen(climbTraj.cmd())));
+                                                                .andThen(climbTraj.cmd()))));
 
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
