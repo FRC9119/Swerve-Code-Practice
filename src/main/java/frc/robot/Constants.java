@@ -73,4 +73,11 @@ public final class Constants {
 
   }
 
+  public static final class DriveConstants {
+    // This number is multiplied by joystick input and max speed to get target velocities
+    public static final double SPEED_SCALAR = .7;
+    // Same thing, but only applied while the robot is shooting and pointing itself to the hub
+    public static final double SPEED_SCALAR_WHILE_TARGETING = .5;
+  }
+
 }

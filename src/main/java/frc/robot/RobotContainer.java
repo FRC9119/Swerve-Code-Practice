@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
-
+import static frc.robot.Constants.DriveConstants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -72,8 +72,8 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed*.8)
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed*.8)
+                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed * SPEED_SCALAR)
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed * SPEED_SCALAR)
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
@@ -99,13 +99,13 @@ public class RobotContainer {
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
                                                                 .withVelocityX(-Math.atan(
-                                                                                joystick.getRawAxis(1) * MaxSpeed * .8))
+                                                                                joystick.getRawAxis(1) * MaxSpeed * SPEED_SCALAR_WHILE_TARGETING))
                                                                 .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * .8));
+                                                                                joystick.getRawAxis(0) * MaxSpeed * SPEED_SCALAR_WHILE_TARGETING));
                                         }
                                         else
-                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1) * MaxSpeed))
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0) * MaxSpeed))
+                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed * SPEED_SCALAR)
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed * SPEED_SCALAR)
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
 
                                 }));
