@@ -175,7 +175,8 @@ public class Auto {
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd(),
                                                 ballSubsystem.spinUpCommand()));
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
+                scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()));
 
                 return routine;
 
