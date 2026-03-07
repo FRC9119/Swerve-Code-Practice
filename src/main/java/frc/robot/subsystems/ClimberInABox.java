@@ -70,7 +70,7 @@ public class ClimberInABox extends SubsystemBase {
     }
 
     public void release() {
-        kraken.set(-.5);
+        kraken.set(-1);
     }
 
     public void stop() {
