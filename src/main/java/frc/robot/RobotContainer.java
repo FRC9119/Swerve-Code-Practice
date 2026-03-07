@@ -127,17 +127,13 @@ public class RobotContainer {
                 
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log.
-                joystick.povUp().and(joystick.circle()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                joystick.povDown().and(joystick.circle()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                joystick.povLeft().and(joystick.circle()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                joystick.povRight().and(joystick.circle()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-                
+                                
 // SysId bindings (ONLY FOR TESTING)
 joystick.povUp().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
 joystick.povDown().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 joystick.povLeft().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-
+// Start and end SysId logging
 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
                 // reset the field-centric heading on left bumper press
