@@ -6,6 +6,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -28,7 +29,10 @@ public class Auto {
                 // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
-                                drivetrain::resetPose,
+                                (Pose2d pose) -> {
+                                        drivetrain.getPigeon2().setYaw(pose.getRotation().getDegrees());
+                                        drivetrain.resetPose(pose);
+                                },
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);

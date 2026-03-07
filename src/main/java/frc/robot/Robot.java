@@ -15,7 +15,6 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    m_robotContainer.drivetrain.getPigeon2().setYaw(180);
 
   }
 
@@ -38,7 +37,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // Get command from autoChooser, and schedule it to be run (happens almost instantly)
+    // Get command from autoChooser, and schedule it to be run (happens almost instantly and runs until auto is done)
     m_autonomousCommand = m_robotContainer.auto.autoChooser.selectedCommand();
     CommandScheduler.getInstance().schedule(m_autonomousCommand);
   }
