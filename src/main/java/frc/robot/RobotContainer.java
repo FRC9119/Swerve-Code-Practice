@@ -104,8 +104,8 @@ public class RobotContainer {
                                                                                 joystick.getRawAxis(0) * MaxSpeed * SPEED_SCALAR_WHILE_TARGETING));
                                         }
                                         else
-                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1)) * MaxSpeed * SPEED_SCALAR)
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * MaxSpeed * SPEED_SCALAR)
+                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1)) * speedScalar)
+                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * speedScalar)
                                                 .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
 
                                 }));
