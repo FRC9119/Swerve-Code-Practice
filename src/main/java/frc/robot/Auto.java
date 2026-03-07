@@ -2,7 +2,7 @@ package frc.robot;
 
 import static frc.robot.Constants.ClimbConstants.CLIMB_CYCLE_TIME;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_8;
-
+import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_ALL;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -48,7 +48,8 @@ public class Auto {
                 autoChooser.addRoutine("Shoot (from center)", this::centerShoot);
                 autoChooser.addRoutine("Shoot, climb left (from center)", this::centerShootClimbLeft);
                 autoChooser.addRoutine("Shoot, climb right (from center)", this::centerShootClimbRight);
-
+                autoChooser.addRoutine("Left two cycle", this::leftTwoCycle);
+                autoChooser.addRoutine("Right two cycle", this::rightTwoCycle);
                 SmartDashboard.putData("auto", autoChooser);
         }
 
@@ -231,4 +232,59 @@ public class Auto {
 
                 return routine;
         }
+private AutoRoutine leftTwoCycle (){
+                        AutoRoutine routine = autoFactory.newRoutine("leftTwoCycle");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
+                AutoTrajectory scoreTraj1 = routine.trajectory("scoreAfterLeftIntake");
+                AutoTrajectory depotTraj = routine.trajectory("depotAfterLeftScore");
+                AutoTrajectory scoreTraj2 = routine.trajectory("scoreAfterDepot");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+
+                intakeTraj.done().onTrue(scoreTraj1.cmd());
+
+                scoreTraj1.active().whileTrue(ballSubsystem.spinUpCommand());
+
+                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(depotTraj.cmd()));
+                depotTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+                depotTraj.done().onTrue(scoreTraj2.cmd());
+                scoreTraj2.active().onTrue(ballSubsystem.spinUpCommand());
+                scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()));
+
+                return routine;
+                }
+                private AutoRoutine rightTwoCycle (){
+                        AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
+                AutoTrajectory scoreTraj1 = routine.trajectory("scoreAfterRightIntake");
+                AutoTrajectory outpostTraj = routine.trajectory("outpostAfterRightScore");
+                AutoTrajectory scoreTraj2 = routine.trajectory("scoreAfterOutpost");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+
+                intakeTraj.done().onTrue(scoreTraj1.cmd());
+
+                scoreTraj1.active().whileTrue(ballSubsystem.spinUpCommand());
+
+                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(outpostTraj.cmd()));
+                outpostTraj.done().onTrue(Commands.waitSeconds(2).andThen(scoreTraj2.cmd()));
+                scoreTraj2.active().onTrue(ballSubsystem.spinUpCommand());
+                scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()));
+
+                return routine;
+                }
 }
