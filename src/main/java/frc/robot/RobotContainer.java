@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -27,10 +26,10 @@ import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
-         // kSpeedAt12Volts desired top speed
+        // kSpeedAt12Volts desired top speed
         private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
         // 3/4 of a rotation per second max angular velocity
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); 
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -67,9 +66,9 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                double speedScalar = MaxSpeed * (SPEED_SCALAR +joystick.getR2Axis()*(1-SPEED_SCALAR));
+                double speedScalar = MaxSpeed * (SPEED_SCALAR + joystick.getR2Axis() * (1 - SPEED_SCALAR));
                 // Add joystick controll to swerve request
-               // Note that X is defined as forward according to WPILib convention,
+                // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
@@ -91,22 +90,27 @@ public class RobotContainer {
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
                                 .until(() -> ballSubsystem.launchBang.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
-                                
+
                                 .whileTrue(drivetrain.applyRequest(() -> {
-                                        if (USE_SHOOTER_LIMELIGHT){
-                                                if(joystick.cross().getAsBoolean()) return brake;
+                                        if (USE_SHOOTER_LIMELIGHT) {
+                                                if (joystick.cross().getAsBoolean())
+                                                        return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
                                                                                 drivetrain.getState().Pose)))
                                                                 .withVelocityX(-Math.atan(
-                                                                                joystick.getRawAxis(1) * MaxSpeed * SPEED_SCALAR_WHILE_TARGETING))
+                                                                                joystick.getRawAxis(1) * MaxSpeed
+                                                                                                * SPEED_SCALAR_WHILE_TARGETING))
                                                                 .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed * SPEED_SCALAR_WHILE_TARGETING));
-                                        }
-                                        else
-                                                return drive.withVelocityX(-Math.atan(joystick.getRawAxis(1)) * speedScalar)
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * speedScalar)
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate);
+                                                                                joystick.getRawAxis(0) * MaxSpeed
+                                                                                                * SPEED_SCALAR_WHILE_TARGETING));
+                                        } else
+                                                return drive.withVelocityX(
+                                                                -Math.atan(joystick.getRawAxis(1)) * speedScalar)
+                                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0))
+                                                                                * speedScalar)
+                                                                .withRotationalRate(-joystick.getRawAxis(2)
+                                                                                * MaxAngularRate);
 
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
@@ -122,23 +126,24 @@ public class RobotContainer {
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
                 // climb while d-pad up is pressed, come back down while d-pad down is pressed
-                operatorController.povUp().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
-                operatorController.povDown().whileTrue(climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
-                
+                operatorController.povUp().whileTrue(
+                                climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
+                operatorController.povDown().whileTrue(
+                                climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
+
                 // Run SysId routines using d-pad buttons while holding circle
-                // Note that each routine should be run exactly once in a single log.
-                                
-// SysId bindings (ONLY FOR TESTING)
-joystick.povUp().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-joystick.povDown().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-joystick.povLeft().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-// Start and end SysId logging
-operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+                // Note that each routine should be run exactly once in a single log. (ONLY FOR
+                // TESTING)
+                joystick.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                joystick.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                joystick.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                // Start and end SysId logging
+                operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
                 // reset the field-centric heading on left bumper press
                 joystick.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-                        
+
                 // zero gyro yaw on right bumper press
                 joystick.R1().onTrue(drivetrain.runOnce(() -> drivetrain.getPigeon2().setYaw(0)));
                 // give logs to drivetrain
