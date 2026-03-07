@@ -32,7 +32,9 @@ public class Auto {
                 autoFactory = new AutoFactory(
                                 () -> drivetrain.getState().Pose,
                                 (Pose2d pose) -> {
+                                        drivetrain.resetPose(pose);
                                         drivetrain.getPigeon2().setYaw(pose.getRotation().getDegrees());
+                                        System.out.println(pose.getRotation().getDegrees());
                                         drivetrain.resetPose(pose);
                                 },
                                 drivetrain::followTrajectory,
