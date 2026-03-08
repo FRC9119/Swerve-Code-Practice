@@ -13,5 +13,7 @@ public class Dashboard {
         SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
         SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
         SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
+        SmartDashboard.putNumber("slope", 650);
+        SmartDashboard.putNumber("intercept", 1900);
     }
 }

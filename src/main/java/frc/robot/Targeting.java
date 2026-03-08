@@ -10,6 +10,7 @@ import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // This is just a class that has helpful methods for targeting the hub.
 // There is no need to instantiate this class because everything is static (meaning it never changes based on variables in the class)
@@ -35,7 +36,8 @@ public class Targeting {
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y)).minus(coordinates)
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
+    System.out.println(723.75 * distance + 2081);
     // equation from spreadsheet measurements
-    return 723.75 * distance + 2081;
+    return SmartDashboard.getNumber("slope", 650) * distance + SmartDashboard.getNumber("intercept", 1900);
   }
 }
