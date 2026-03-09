@@ -33,9 +33,8 @@ public class Auto {
                                 () -> drivetrain.getState().Pose,
                                 (Pose2d pose) -> {
                                         drivetrain.resetPose(pose);
-                                        drivetrain.getPigeon2().setYaw(pose.getRotation().getDegrees());
-                                        System.out.println(pose.getRotation().getDegrees());
-                                        drivetrain.resetPose(pose);
+                                        System.out.println(drivetrain.getState().Pose);
+                                        System.out.println(drivetrain.getPigeon2().getYaw());
                                 },
                                 drivetrain::followTrajectory,
                                 true,
@@ -176,7 +175,7 @@ public class Auto {
                                                 scoreTraj.cmd(),
                                                 ballSubsystem.spinUpCommand()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand()));
+                                                .andThen(ballSubsystem.launchCommand().withTimeout(5)));
 
                 return routine;
 
