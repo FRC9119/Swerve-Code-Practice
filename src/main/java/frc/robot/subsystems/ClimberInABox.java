@@ -19,16 +19,18 @@ public class ClimberInABox extends SubsystemBase {
     private final CommandSwerveDrivetrain drivetrain;
     private final PIDController alignX = new PIDController(ALIGN_XY_KP, 0, 0);
     private final PIDController alignY = new PIDController(ALIGN_XY_KP, 0, 0);
+    private final TalonFXConfiguration config = new TalonFXConfiguration();
 
     public ClimberInABox(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
         kraken = new TalonFX(CLIMB_MOTOR_ID);
-        TalonFXConfiguration config = new TalonFXConfiguration();
         config.CurrentLimits.SupplyCurrentLimit = MAX_CLIMB_CURRENT;
+        // set forward limit, default is zero. 
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         kraken.getConfigurator().apply(config);
         kraken.setNeutralMode(NeutralModeValue.Brake);
     }
-
+    // NOT FUNCTIONAL YET
     public Command align(Alignment a) {
         return this.run(() -> {
             Pose2d goalPosition;
@@ -57,7 +59,17 @@ public class ClimberInABox extends SubsystemBase {
         });
 
     }
+    public void disableLimit(){
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        kraken.getConfigurator().apply(config);
 
+    }
+    public void reenableLimit(){
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        kraken.setPosition(0);
+        kraken.getConfigurator().apply(config);
+
+    }
     public enum Alignment {
         Left, Right
     }
