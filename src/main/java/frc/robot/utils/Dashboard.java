@@ -1,12 +1,14 @@
-package frc.robot;
+package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Auto;
+
 import static frc.robot.Constants.ClimbConstants.*;
 import static frc.robot.Constants.FuelConstants.*;
 import choreo.auto.AutoChooser;
 
 public class Dashboard {
-    AutoChooser autoChooser;
+    public AutoChooser autoChooser;
     public Dashboard(Auto auto) {
         // Put a bunch of constants onto the dashboard
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);

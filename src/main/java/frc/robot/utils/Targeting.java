@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.utils;
 
 import static frc.robot.Constants.FuelConstants.DEFAULT_LAUNCH_RPM;
 import static frc.robot.Constants.FuelConstants.FULL_FIELD_X;
