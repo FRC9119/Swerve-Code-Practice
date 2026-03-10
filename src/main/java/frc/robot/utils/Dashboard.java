@@ -31,6 +31,7 @@ public class Dashboard {
                 autoChooser.addRoutine("Shoot, climb right (from center)", auto::centerShootClimbRight);
                 autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
                 autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
+                autoChooser.addRoutine("Right three cycle", auto::rightThreeCycle);
                 SmartDashboard.putData("auto", autoChooser);
 
     }

@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Targeting;
+import frc.robot.utils.Targeting;
 
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
