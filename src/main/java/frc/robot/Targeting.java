@@ -8,6 +8,7 @@ import static frc.robot.Constants.FuelConstants.HUB_Y_COORD;
 import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 // There is no need to instantiate this class because everything is static (meaning it never changes based on variables in the class)
 public class Targeting {
 
-  public static double getRadiansBetweenRobotAndHub(Pose2d pose) {
+  public static Rotation2d getTargetRotation(Pose2d pose) {
     // Change pose as if you were on blue alliance, because we use the coordinates
     // of the blue hub
     Translation2d bluePose = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
@@ -23,7 +24,7 @@ public class Targeting {
             .minus(pose.getTranslation())
         : pose.getTranslation();
     // Calculate angle using inverse tangent
-    return Math.atan2(bluePose.getY() - HUB_Y_COORD, bluePose.getX() - HUB_X_COORD);
+    return new Rotation2d(bluePose.getX() - HUB_X_COORD, bluePose.getY() - HUB_Y_COORD);
   }
 
   public static double getTargetRPM(Pose2d pose) {
