@@ -139,7 +139,7 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand()));
+                                                .andThen(ballSubsystem.launchCommand().withTimeout(5)));
 
                 return routine;
 

@@ -88,7 +88,13 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller
         .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
   }
+  public void launchWithoutTargeting(double rpm){
+    launchBang.setSetpoint(rpm);
+    launcherRoller.set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
+    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
+        intakeRoller.setVoltage(-6);
 
+  }
   // Command factories to turn the spinUp method into a command that requires this subsystem
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
