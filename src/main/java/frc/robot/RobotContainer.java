@@ -136,8 +136,8 @@ public class RobotContainer {
                                 climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
                 operatorController.povDown().whileTrue(
                                 climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
-operatorController.leftBumper().onTrue(Commands.run(climbSubsystem::disableLimit));
-operatorController.leftBumper().onFalse(Commands.run(climbSubsystem::reenableLimit));
+operatorController.leftStick().onTrue(Commands.run(climbSubsystem::disableLimit));
+operatorController.leftStick().onFalse(Commands.run(climbSubsystem::reenableLimit));
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log. (ONLY FOR
                 // TESTING)
