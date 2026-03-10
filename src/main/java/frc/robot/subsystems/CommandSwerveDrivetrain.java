@@ -240,6 +240,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Apply the generated speeds
         this.setControl(m_pathApplyFieldSpeeds.withSpeeds(speeds));
     }
+    public Pose2d getPose() {
+        return this.getState().Pose;
+    }
 
     @Override
     public void periodic() {

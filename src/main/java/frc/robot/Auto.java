@@ -7,7 +7,6 @@ import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_ALL;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberInABox;
@@ -27,13 +26,8 @@ public class Auto {
                 this.climbSubsystem = climbSubsystem;
                 // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
-                                () -> drivetrain.getState().Pose,
-                                (Pose2d pose) -> {
-                                        drivetrain.resetPose(pose);
-                                        drivetrain.getPigeon2().setYaw(pose.getRotation().getDegrees());
-                                        System.out.println(pose.getRotation().getDegrees());
-                                        drivetrain.resetPose(pose);
-                                },
+                                drivetrain::getPose,
+                                drivetrain::resetPose,
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
