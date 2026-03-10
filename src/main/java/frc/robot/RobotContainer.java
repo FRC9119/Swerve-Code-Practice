@@ -43,6 +43,7 @@ public class RobotContainer {
                         // Add a 10% deadband
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                        // Flip perspective (angle and velocity) when on red
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
         // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);

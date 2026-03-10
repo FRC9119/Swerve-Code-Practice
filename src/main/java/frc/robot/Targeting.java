@@ -23,9 +23,10 @@ public class Targeting {
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y))
             .minus(pose.getTranslation())
         : pose.getTranslation();
-    // Calculate angle using inverse tangent
+    // Calculate angle by giving Rotation2d an x and y
     return new Rotation2d(bluePose.getX() - HUB_X_COORD, bluePose.getY() - HUB_Y_COORD);
   }
+
 
   public static double getTargetRPM(Pose2d pose) {
     if (!USE_SHOOTER_LIMELIGHT)
@@ -39,4 +40,5 @@ public class Targeting {
     // equation from spreadsheet measurements
     return 723.75 * distance + 2081;
   }
+
 }
