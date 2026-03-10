@@ -58,11 +58,13 @@ public class RobotContainer {
         // Init auto
         public final Auto auto = new Auto(drivetrain, ballSubsystem, climbSubsystem);
 
+        // Init dashboard, which sends all options to SmartDashboard/Elastic
+        public final Dashboard dashboard = new Dashboard(auto);
+
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
                 LimelightHelpers.setupPortForwardingUSB(0);
-                // Publish values to the dashboard
-                Dashboard.publish();
+                
 
                 configureBindings();
         }

@@ -4,12 +4,10 @@ import static frc.robot.Constants.ClimbConstants.CLIMB_CYCLE_TIME;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_8;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_ALL;
 
-import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberInABox;
@@ -18,10 +16,9 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class Auto {
 
         // Choreo initialization
-        private final AutoFactory autoFactory;
-        public final AutoChooser autoChooser;
-        private final CANFuelSubsystem ballSubsystem;
-        private final ClimberInABox climbSubsystem;
+        public final AutoFactory autoFactory;
+        public final CANFuelSubsystem ballSubsystem;
+        public final ClimberInABox climbSubsystem;
 
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem, ClimberInABox climbSubsystem) {
                 // Set the local subsystem to the subsystems passed into the constructor
@@ -40,25 +37,12 @@ public class Auto {
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
-                // Make autoChooser with all autos and add it to dashboard
-                autoChooser = new AutoChooser();
-
-                autoChooser.addRoutine("Intake, shoot (from left)", this::leftIntakeShoot);
-                autoChooser.addRoutine("Intake, shoot (from right)", this::rightIntakeShoot);
-                autoChooser.addRoutine("Intake, shoot, climb (from left)", this::leftIntakeShootClimb);
-                autoChooser.addRoutine("Intake, shoot, climb (from right)", this::rightIntakeShootClimb);
-                autoChooser.addRoutine("Shoot (from center)", this::centerShoot);
-                autoChooser.addRoutine("Shoot, climb left (from center)", this::centerShootClimbLeft);
-                autoChooser.addRoutine("Shoot, climb right (from center)", this::centerShootClimbRight);
-                autoChooser.addRoutine("Left two cycle", this::leftTwoCycle);
-                autoChooser.addRoutine("Right two cycle", this::rightTwoCycle);
-                SmartDashboard.putData("auto", autoChooser);
         }
 
         // Use this auto as a reference
         // This function defines a routine and then returns it
         // It's a generator
-        private AutoRoutine leftIntakeShootClimb() {
+        public AutoRoutine leftIntakeShootClimb() {
                 // Initialize the routine with name
                 AutoRoutine routine = autoFactory.newRoutine("leftIntakeShootClimb");
 
@@ -94,7 +78,7 @@ public class Auto {
 
         }
 
-        private AutoRoutine rightIntakeShootClimb() {
+        public AutoRoutine rightIntakeShootClimb() {
                 AutoRoutine routine = autoFactory.newRoutine("rightIntakeShootClimb");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
@@ -119,7 +103,7 @@ public class Auto {
 
         }
 
-        private AutoRoutine leftIntakeShoot() {
+        public AutoRoutine leftIntakeShoot() {
                 AutoRoutine routine = autoFactory.newRoutine("leftIntakeShoot");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
@@ -142,7 +126,7 @@ public class Auto {
 
         }
 
-        private AutoRoutine rightIntakeShoot() {
+        public AutoRoutine rightIntakeShoot() {
                 AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
@@ -165,7 +149,7 @@ public class Auto {
 
         }
 
-        private AutoRoutine centerShoot() {
+        public AutoRoutine centerShoot() {
                 AutoRoutine routine = autoFactory.newRoutine("centerShoot");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
@@ -183,7 +167,7 @@ public class Auto {
         }
 
         // Use this as another complex example
-        private AutoRoutine centerShootClimbLeft() {
+        public AutoRoutine centerShootClimbLeft() {
                 // create routine and name it
                 AutoRoutine routine = autoFactory.newRoutine("centerShootClimbLeft");
 
@@ -214,7 +198,7 @@ public class Auto {
                 return routine;
         }
 
-        private AutoRoutine centerShootClimbRight() {
+        public AutoRoutine centerShootClimbRight() {
                 AutoRoutine routine = autoFactory.newRoutine("centerShootClimbRight");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
@@ -235,7 +219,7 @@ public class Auto {
 
                 return routine;
         }
-private AutoRoutine leftTwoCycle (){
+public AutoRoutine leftTwoCycle (){
                         AutoRoutine routine = autoFactory.newRoutine("leftTwoCycle");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
@@ -263,7 +247,7 @@ private AutoRoutine leftTwoCycle (){
 
                 return routine;
                 }
-                private AutoRoutine rightTwoCycle (){
+                public AutoRoutine rightTwoCycle (){
                         AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
