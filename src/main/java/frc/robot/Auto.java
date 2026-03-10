@@ -1,29 +1,63 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.ClimbConstants.CLIMB_CYCLE_TIME;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_8;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_ALL;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.utils.Targeting;
 
 public class Auto {
 
         // Choreo initialization
         public final AutoFactory autoFactory;
-        public final CANFuelSubsystem ballSubsystem;
-        public final ClimberInABox climbSubsystem;
+        private final CANFuelSubsystem ballSubsystem;
+        private final ClimberInABox climbSubsystem;
+        private final CommandSwerveDrivetrain drivetrain;
 
+
+        // kSpeedAt12Volts desired top speed
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        // 3/4 of a rotation per second max angular velocity
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+
+        // Request to drive and face hub
+        private final SwerveRequest.FieldCentricFacingAngle rotateTowardsHub = new SwerveRequest.FieldCentricFacingAngle()
+                        .withHeadingPID(10, 0, 0)
+                        // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                        // Flip perspective (angle and velocity) when on red
+                        .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective).withVelocityX(0).withVelocityY(0);
+private final Command rotateToHub(){
+        return drivetrain.applyRequest(() -> rotateTowardsHub.withTargetDirection(Targeting.getTargetRotation(drivetrain.getPose())));
+}
+        private final Command launchWithTargeting(){ 
+
+                return ballSubsystem.spinUpCommand().alongWith(rotateToHub()).until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand().alongWith(rotateToHub()).withTimeout(TIME_TO_LAUNCH_ALL));
+        }
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem, ClimberInABox climbSubsystem) {
                 // Set the local subsystem to the subsystems passed into the constructor
                 // (real instances from RobotContainer)
                 this.ballSubsystem = ballSubsystem;
                 this.climbSubsystem = climbSubsystem;
+                this.drivetrain = drivetrain;
                 // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
                                 drivetrain::getPose,
@@ -255,12 +289,10 @@ public AutoRoutine leftTwoCycle (){
 
                 intakeTraj.done().onTrue(scoreTraj1.cmd());
 
-                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(outpostTraj.cmd()));
+                scoreTraj1.done().onTrue(launchWithTargeting().andThen(outpostTraj.cmd()));
                 outpostTraj.done().onTrue(Commands.waitSeconds(2).andThen(scoreTraj2.cmd()));
-                scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(intakeTraj2.cmd())));
-                intakeTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand()));
+                scoreTraj2.done().onTrue(launchWithTargeting().andThen(intakeTraj2.cmd()));
+                intakeTraj2.done().onTrue(launchWithTargeting());
 
                 return routine;
                 }
