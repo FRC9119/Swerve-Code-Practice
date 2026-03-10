@@ -32,7 +32,7 @@ public class ClimberInABox extends SubsystemBase {
     public Command align(Alignment a) {
         return this.run(() -> {
             Pose2d goalPosition;
-            Pose2d currentPosition = drivetrain.getState().Pose;
+            Pose2d currentPosition = drivetrain.getPose();
             // TODO: figure out what these poses are
             switch (a) {
                 case Left:

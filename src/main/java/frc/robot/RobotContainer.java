@@ -101,7 +101,7 @@ public class RobotContainer {
                                                         return brake;
                                                 return targetHub.withTargetDirection(
                                                                 new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
-                                                                                drivetrain.getState().Pose)))
+                                                                                drivetrain.getPose())))
                                                                 .withVelocityX(-Math.atan(
                                                                                 joystick.getRawAxis(1) * MaxSpeed
                                                                                                 * SPEED_SCALAR_WHILE_TARGETING))
