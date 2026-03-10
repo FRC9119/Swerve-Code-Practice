@@ -14,7 +14,6 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,6 +25,10 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.utils.Dashboard;
+import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.Targeting;
+import frc.robot.utils.Telemetry;
 
 public class RobotContainer {
         // kSpeedAt12Volts desired top speed
@@ -44,11 +47,12 @@ public class RobotContainer {
                         // Add a 10% deadband
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                        // Flip perspective (angle and velocity) when on red
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
         // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
         // Driver Controller
-        private final CommandPS5Controller joystick = new CommandPS5Controller(0);
+        private final CommandPS5Controller driverController = new CommandPS5Controller(0);
         // Operator Controller
         private final CommandXboxController operatorController = new CommandXboxController(1);
         // Init Subsystems
@@ -58,26 +62,28 @@ public class RobotContainer {
         // Init auto
         public final Auto auto = new Auto(drivetrain, ballSubsystem, climbSubsystem);
 
+        // Init dashboard, which sends all options to SmartDashboard/Elastic
+        public final Dashboard dashboard = new Dashboard(auto);
+
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
                 LimelightHelpers.setupPortForwardingUSB(0);
-                // Publish values to the dashboard
-                Dashboard.publish();
+                
 
                 configureBindings();
         }
 
         private void configureBindings() {
-                double speedScalar = MaxSpeed * (SPEED_SCALAR + joystick.getR2Axis() * (1 - SPEED_SCALAR));
+                double speedScalar = MaxSpeed * (SPEED_SCALAR + driverController.getR2Axis() * (1 - SPEED_SCALAR));
                 // Add joystick controll to swerve request
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(joystick.getRawAxis(1)) * speedScalar)
-                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0)) * speedScalar)
-                                                .withRotationalRate(-joystick.getRawAxis(2) * MaxAngularRate)));
+                                                .withVelocityX(-Math.atan(driverController.getRawAxis(1)) * speedScalar)
+                                                .withVelocityY(-Math.atan(driverController.getRawAxis(0)) * speedScalar)
+                                                .withRotationalRate(-driverController.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -95,23 +101,22 @@ public class RobotContainer {
 
                                 .whileTrue(drivetrain.applyRequest(() -> {
                                         if (USE_SHOOTER_LIMELIGHT) {
-                                                if (joystick.cross().getAsBoolean())
+                                                if (driverController.cross().getAsBoolean())
                                                         return brake;
                                                 return targetHub.withTargetDirection(
-                                                                new Rotation2d(Targeting.getRadiansBetweenRobotAndHub(
-                                                                                drivetrain.getState().Pose)))
+                                                                Targeting.getTargetRotation(drivetrain.getPose()))
                                                                 .withVelocityX(-Math.atan(
-                                                                                joystick.getRawAxis(1) * MaxSpeed
+                                                                                driverController.getRawAxis(1) * MaxSpeed
                                                                                                 * SPEED_SCALAR_WHILE_TARGETING))
                                                                 .withVelocityY(-Math.atan(
-                                                                                joystick.getRawAxis(0) * MaxSpeed
+                                                                                driverController.getRawAxis(0) * MaxSpeed
                                                                                                 * SPEED_SCALAR_WHILE_TARGETING));
                                         } else
                                                 return drive.withVelocityX(
-                                                                -Math.atan(joystick.getRawAxis(1)) * speedScalar)
-                                                                .withVelocityY(-Math.atan(joystick.getRawAxis(0))
+                                                                -Math.atan(driverController.getRawAxis(1)) * speedScalar)
+                                                                .withVelocityY(-Math.atan(driverController.getRawAxis(0))
                                                                                 * speedScalar)
-                                                                .withRotationalRate(-joystick.getRawAxis(2)
+                                                                .withRotationalRate(-driverController.getRawAxis(2)
                                                                                 * MaxAngularRate);
 
                                 }));
@@ -141,18 +146,18 @@ operatorController.leftStick().onFalse(Commands.run(climbSubsystem::reenableLimi
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log. (ONLY FOR
                 // TESTING)
-                joystick.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                joystick.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                joystick.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                joystick.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                driverController.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                driverController.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                driverController.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                driverController.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
                 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
                 // reset the field-centric heading on left bumper press
-                joystick.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
                 // zero gyro yaw on right bumper press
-                joystick.R1().onTrue(drivetrain.runOnce(() -> 
+                driverController.R1().onTrue(drivetrain.runOnce(() -> 
                 // get alliance and make sure it exists
                 DriverStation.getAlliance().ifPresent((alliance) -> 
                 // set gyro to 0 if blue, 180 if red

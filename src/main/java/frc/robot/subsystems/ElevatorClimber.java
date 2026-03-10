@@ -31,7 +31,7 @@ public class ElevatorClimber extends SubsystemBase{
 //     public Command align(Alignment a){
 //         return this.run(() -> {
 //             Pose2d goalPosition;
-//         Pose2d currentPosition = drivetrain.getState().Pose;
+//         Pose2d currentPosition = drivetrain.getPose;
 //         switch (a) {
 //             case Left: 
 //                 goalPosition = new Pose2d();

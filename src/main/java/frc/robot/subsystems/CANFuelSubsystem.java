@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.FuelConstants.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Targeting;
+import frc.robot.utils.Targeting;
 
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
@@ -65,7 +65,7 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // A method to set the rollers to values for launching.
   public void launch() {
-    launchBang.setSetpoint(Targeting.getTargetRPM(drivetrain.getState().Pose));
+    launchBang.setSetpoint(Targeting.getTargetRPM(drivetrain.getPose()));
     intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
@@ -82,7 +82,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
-    launchBang.setSetpoint(Targeting.getTargetRPM(drivetrain.getState().Pose));
+    System.out.println(launchBang.getError());
+    launchBang.setSetpoint(Targeting.getTargetRPM(drivetrain.getPose()));
 
     launcherRoller
         .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));

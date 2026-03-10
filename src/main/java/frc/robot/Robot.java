@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Get command from autoChooser, and schedule it to be run (happens almost instantly and runs until auto is done)
-    m_autonomousCommand = m_robotContainer.auto.autoChooser.selectedCommand();
+    m_autonomousCommand = m_robotContainer.dashboard.autoChooser.selectedCommand();
     CommandScheduler.getInstance().schedule(m_autonomousCommand);
   }
 
