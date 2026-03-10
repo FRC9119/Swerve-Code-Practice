@@ -31,6 +31,10 @@ public class Auto {
                                 drivetrain::followTrajectory,
                                 true,
                                 drivetrain);
+
+                // run intake and spinup on respective event markers (that are added in choreo)
+autoFactory.bind("intake", ballSubsystem.intakeCommand());
+autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
         }
 
         // Use this auto as a reference
@@ -51,14 +55,8 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                // Starting at the event marker named "intake", run the intake
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 // When the trajectory is done, start the next trajectory and at the same time, raise the climb arm up
                 intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
-
-                // While the trajectory is active, prepare the scoring subsystem
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 // When the trajectory is done, score
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand()
@@ -84,11 +82,7 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
-
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8).andThen(climbTraj.cmd()));
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
@@ -108,11 +102,7 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 intakeTraj.done().onTrue(scoreTraj.cmd());
-
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand());
 
@@ -131,11 +121,7 @@ public class Auto {
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 intakeTraj.done().onTrue(scoreTraj.cmd());
-
-                scoreTraj.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand());
 
@@ -151,8 +137,7 @@ public class Auto {
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd(),
-                                                ballSubsystem.spinUpCommand()));
+                                                scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()));
 
@@ -173,8 +158,7 @@ public class Auto {
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd(),
-                                                ballSubsystem.spinUpCommand()));
+                                                scoreTraj.cmd()));
                 // after first trajectory
                 scoreTraj.done().onTrue(
                         // put climb arm up
@@ -200,8 +184,7 @@ public class Auto {
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd(),
-                                                ballSubsystem.spinUpCommand()));
+                                                scoreTraj.cmd()));
                 scoreTraj.done().onTrue(
                                 Commands.parallel(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
                                 ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
@@ -226,16 +209,11 @@ public AutoRoutine leftTwoCycle (){
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 intakeTraj.done().onTrue(scoreTraj1.cmd());
 
-                scoreTraj1.active().whileTrue(ballSubsystem.spinUpCommand());
-
                 scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(depotTraj.cmd()));
-                depotTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
+              
                 depotTraj.done().onTrue(scoreTraj2.cmd());
-                scoreTraj2.active().onTrue(ballSubsystem.spinUpCommand());
                 scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()));
 
@@ -254,15 +232,10 @@ public AutoRoutine leftTwoCycle (){
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.atTime("intake").onTrue(ballSubsystem.intakeCommand());
-
                 intakeTraj.done().onTrue(scoreTraj1.cmd());
-
-                scoreTraj1.active().whileTrue(ballSubsystem.spinUpCommand());
 
                 scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(outpostTraj.cmd()));
                 outpostTraj.done().onTrue(Commands.waitSeconds(2).andThen(scoreTraj2.cmd()));
-                scoreTraj2.active().onTrue(ballSubsystem.spinUpCommand());
                 scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()));
 
