@@ -30,7 +30,6 @@ public class Auto {
         private final ClimberInABox climbSubsystem;
         private final CommandSwerveDrivetrain drivetrain;
 
-
         // kSpeedAt12Volts desired top speed
         private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
         // 3/4 of a rotation per second max angular velocity
@@ -43,15 +42,22 @@ public class Auto {
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
                         // Flip perspective (angle and velocity) when on red
-                        .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective).withVelocityX(0).withVelocityY(0);
-private final Command rotateToHub(){
-        return drivetrain.applyRequest(() -> rotateTowardsHub.withTargetDirection(Targeting.getTargetRotation(drivetrain.getPose())));
-}
-        private final Command launchWithTargeting(){ 
+                        .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective).withVelocityX(0)
+                        .withVelocityY(0);
 
-                return ballSubsystem.spinUpCommand().alongWith(rotateToHub()).until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand().alongWith(rotateToHub()).withTimeout(TIME_TO_LAUNCH_ALL));
+        private final Command rotateToHub() {
+                return drivetrain.applyRequest(() -> rotateTowardsHub
+                                .withTargetDirection(Targeting.getTargetRotation(drivetrain.getPose())));
         }
+
+        private final Command launchWithTargeting() {
+
+                return ballSubsystem.spinUpCommand().alongWith(rotateToHub())
+                                .until(() -> ballSubsystem.launchBang.atSetpoint())
+                                .andThen(ballSubsystem.launchCommand().alongWith(rotateToHub())
+                                                .withTimeout(TIME_TO_LAUNCH_ALL));
+        }
+
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem, ClimberInABox climbSubsystem) {
                 // Set the local subsystem to the subsystems passed into the constructor
                 // (real instances from RobotContainer)
@@ -67,8 +73,8 @@ private final Command rotateToHub(){
                                 drivetrain);
 
                 // run intake and spinup on respective event markers (that are added in choreo)
-autoFactory.bind("intake", ballSubsystem.intakeCommand());
-autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
+                autoFactory.bind("intake", ballSubsystem.intakeCommand());
+                autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
         }
 
         // Use this auto as a reference
@@ -89,8 +95,10 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                // When the trajectory is done, start the next trajectory and at the same time, raise the climb arm up
-                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
+                // When the trajectory is done, start the next trajectory and at the same time,
+                // raise the climb arm up
+                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(),
+                                climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
 
                 // When the trajectory is done, score
                 scoreTraj.done().onTrue(ballSubsystem.launchCommand()
@@ -116,9 +124,11 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 intakeTraj.resetOdometry(),
                                                 intakeTraj.cmd()));
 
-                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(), climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
+                intakeTraj.done().onTrue(Commands.parallel(scoreTraj.cmd(),
+                                climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME)));
 
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8).andThen(climbTraj.cmd()));
+                scoreTraj.done().onTrue(
+                                ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8).andThen(climbTraj.cmd()));
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
                 return routine;
@@ -173,7 +183,7 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand().withTimeout(5)));
+                                .andThen(ballSubsystem.launchCommand().withTimeout(5)));
 
                 return routine;
 
@@ -195,15 +205,16 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 scoreTraj.cmd()));
                 // after first trajectory
                 scoreTraj.done().onTrue(
-                        // put climb arm up
-                                Commands.parallel( climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
-                                // at the same time, stay still until launcher is up to speed
-                                ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                // then launch for three seconds
-                                                .andThen(ballSubsystem.launchCommand()
-                                                                .withTimeout(TIME_TO_LAUNCH_8)
-                                                                // start next trajectory afterwards
-                                                                .andThen(climbTraj.cmd()))));
+                                // put climb arm up
+                                Commands.parallel(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
+                                                // at the same time, stay still until launcher is up to speed
+                                                ballSubsystem.spinUpCommand()
+                                                                .until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                                // then launch for three seconds
+                                                                .andThen(ballSubsystem.launchCommand()
+                                                                                .withTimeout(TIME_TO_LAUNCH_8)
+                                                                                // start next trajectory afterwards
+                                                                                .andThen(climbTraj.cmd()))));
                 // once in position, climb for the amount of time specified in Constants.java
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
@@ -221,17 +232,19 @@ autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(
                                 Commands.parallel(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME),
-                                ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                                .andThen(ballSubsystem.launchCommand()
-                                                                .withTimeout(TIME_TO_LAUNCH_8)
-                                                                .andThen(climbTraj.cmd()))));
+                                                ballSubsystem.spinUpCommand()
+                                                                .until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                                .andThen(ballSubsystem.launchCommand()
+                                                                                .withTimeout(TIME_TO_LAUNCH_8)
+                                                                                .andThen(climbTraj.cmd()))));
 
                 climbTraj.done().onTrue(climbSubsystem.climbCommand().withTimeout(CLIMB_CYCLE_TIME));
 
                 return routine;
         }
-public AutoRoutine leftTwoCycle (){
-                        AutoRoutine routine = autoFactory.newRoutine("leftTwoCycle");
+
+        public AutoRoutine leftTwoCycle() {
+                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycle");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
                 AutoTrajectory scoreTraj1 = routine.trajectory("scoreAfterLeftIntake");
@@ -244,15 +257,18 @@ public AutoRoutine leftTwoCycle (){
 
                 intakeTraj.done().onTrue(scoreTraj1.cmd());
 
-                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(sweepAndScoreTraj.cmd()));
-              
-                sweepAndScoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL)
+                                .andThen(sweepAndScoreTraj.cmd()));
+
+                sweepAndScoreTraj.done()
+                                .onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()));
 
                 return routine;
-                }
-                public AutoRoutine rightTwoCycle (){
-                        AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
+        }
+
+        public AutoRoutine rightTwoCycle() {
+                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
                 AutoTrajectory scoreTraj1 = routine.trajectory("scoreAfterRightIntake");
@@ -266,15 +282,18 @@ public AutoRoutine leftTwoCycle (){
 
                 intakeTraj.done().onTrue(scoreTraj1.cmd());
 
-                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL).andThen(outpostTraj.cmd()));
+                scoreTraj1.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL)
+                                .andThen(outpostTraj.cmd()));
                 outpostTraj.done().onTrue(Commands.waitSeconds(2).andThen(scoreTraj2.cmd()));
-                scoreTraj2.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                scoreTraj2.done()
+                                .onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
                                                 .andThen(ballSubsystem.launchCommand()));
 
                 return routine;
-                }
-                public AutoRoutine rightThreeCycle (){
-                        AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
+        }
+
+        public AutoRoutine rightThreeCycle() {
+                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
                 AutoTrajectory scoreTraj1 = routine.trajectory("scoreAfterRightIntake");
@@ -295,6 +314,6 @@ public AutoRoutine leftTwoCycle (){
                 intakeTraj2.done().onTrue(launchWithTargeting());
 
                 return routine;
-                }
+        }
 
 }

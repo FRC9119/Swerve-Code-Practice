@@ -9,6 +9,7 @@ import choreo.auto.AutoChooser;
 
 public class Dashboard {
     public AutoChooser autoChooser;
+
     public Dashboard(Auto auto) {
         // Put a bunch of constants onto the dashboard
         SmartDashboard.putNumber("Elevating climb value", MAX_CLIMB_CURRENT);
@@ -19,20 +20,19 @@ public class Dashboard {
         SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
 
         // Make autoChooser with all autos and add it to dashboard
-                autoChooser = new AutoChooser();
+        autoChooser = new AutoChooser();
 
-                autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
-                                autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
-
-                autoChooser.addRoutine("Intake, shoot, climb (from left)", auto::leftIntakeShootClimb);
-                autoChooser.addRoutine("Intake, shoot, climb (from right)", auto::rightIntakeShootClimb);
-                autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
-                autoChooser.addRoutine("Shoot, climb left (from center)", auto::centerShootClimbLeft);
-                autoChooser.addRoutine("Shoot, climb right (from center)", auto::centerShootClimbRight);
-                autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
-                autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
-                autoChooser.addRoutine("Right three cycle", auto::rightThreeCycle);
-                SmartDashboard.putData("auto", autoChooser);
+        autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
+        autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
+        autoChooser.addRoutine("Intake, shoot, climb (from left)", auto::leftIntakeShootClimb);
+        autoChooser.addRoutine("Intake, shoot, climb (from right)", auto::rightIntakeShootClimb);
+        autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
+        autoChooser.addRoutine("Shoot, climb left (from center)", auto::centerShootClimbLeft);
+        autoChooser.addRoutine("Shoot, climb right (from center)", auto::centerShootClimbRight);
+        autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
+        autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
+        autoChooser.addRoutine("Right three cycle", auto::rightThreeCycle);
+        SmartDashboard.putData("auto", autoChooser);
 
     }
 }
