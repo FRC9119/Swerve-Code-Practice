@@ -17,7 +17,7 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"leftScore.x", "val":2.526576042175293}, "y":{"exp":"leftScore.y", "val":5.582211017608643}, "heading":{"exp":"leftScore.heading", "val":2.5}, "intervals":30, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"leftScore.x", "val":2.526576042175293}, "y":{"exp":"leftScore.y", "val":5.582211017608643}, "heading":{"exp":"leftScore.heading", "val":2.5}, "intervals":29, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"1.503861665725708 m", "val":1.503861665725708}, "y":{"exp":"4.906662464141846 m", "val":4.906662464141846}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":16, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
     {"x":{"exp":"leftClimb.x", "val":1.1559804677963257}, "y":{"exp":"leftClimb.y", "val":4.744625091552734}, "heading":{"exp":"leftClimb.heading", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
