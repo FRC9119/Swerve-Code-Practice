@@ -28,7 +28,6 @@ public class Targeting {
     return new Rotation2d(bluePose.getX() - HUB_X_COORD, bluePose.getY() - HUB_Y_COORD);
   }
 
-
   public static double getTargetRPM(Pose2d pose) {
     if (!USE_SHOOTER_LIMELIGHT)
       return DEFAULT_LAUNCH_RPM;

@@ -6,7 +6,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +20,7 @@ import frc.robot.utils.Targeting;
 public class CANFuelSubsystem extends SubsystemBase {
   private final WPI_TalonSRX feederRoller;
   private final TalonFX launcherRoller;
+  private final TalonFX launcherSecondary;
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
   public BangBangController launchBang;
@@ -26,7 +29,10 @@ public class CANFuelSubsystem extends SubsystemBase {
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
     // create brushed motors for each of the motors on the launcher mechanism
-    launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID);
+    launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID_1);
+    launcherSecondary = new TalonFX(LAUNCHER_MOTOR_ID_2);
+    launcherSecondary.setControl(new Follower(LAUNCHER_MOTOR_ID_1, MotorAlignmentValue.Aligned));
+    
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
     // create config for feeder CIM and apply it
