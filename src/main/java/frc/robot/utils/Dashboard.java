@@ -22,6 +22,7 @@ public class Dashboard {
         // Make autoChooser with all autos and add it to dashboard
         autoChooser = new AutoChooser();
 
+<<<<<<< Updated upstream
         autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
         autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
         autoChooser.addRoutine("Intake, shoot, climb (from left)", auto::leftIntakeShootClimb);
@@ -33,6 +34,14 @@ public class Dashboard {
         autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
         autoChooser.addRoutine("Right three cycle", auto::rightThreeCycle);
         SmartDashboard.putData("auto", autoChooser);
+=======
+                autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
+                autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
+                autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
+                autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
+                autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
+                SmartDashboard.putData("auto", autoChooser);
+>>>>>>> Stashed changes
 
     }
 }
