@@ -118,12 +118,12 @@ public class Auto {
                 return routine;
         }
 
-        public AutoRoutine leftTwoCycle() {
-                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycle");
+        public AutoRoutine leftTwoCycleFullField() {
+                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycleFullField");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
                 AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
-                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepThenScoreFromLeftScore");
+                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromLeftScore");
 
                 routine.active().onTrue(
                                 Commands.sequence(
@@ -142,12 +142,61 @@ public class Auto {
                 return routine;
         }
 
-        public AutoRoutine rightTwoCycle() {
-                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycle");
+        
+        public AutoRoutine leftTwoCycleBump() {
+                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycleBump");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
+                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromLeftScore_bump");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.done().onTrue(scoreTraj.cmd());
+
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL)
+                                .andThen(sweepAndScoreTraj.cmd()));
+
+                sweepAndScoreTraj.done()
+                                .onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()));
+
+                return routine;
+        }
+        
+        public AutoRoutine rightTwoCycleBump() {
+                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycleBump");
+
+                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRighttIntake");
+                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromRightScore_bump");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                intakeTraj.resetOdometry(),
+                                                intakeTraj.cmd()));
+
+                intakeTraj.done().onTrue(scoreTraj.cmd());
+
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_ALL)
+                                .andThen(sweepAndScoreTraj.cmd()));
+
+                sweepAndScoreTraj.done()
+                                .onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                                .andThen(ballSubsystem.launchCommand()));
+
+                return routine;
+        }
+
+        public AutoRoutine rightTwoCycleFullField() {
+                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycleFullField");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
                 AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
-                AutoTrajectory sweepTraj = routine.trajectory("sweepThenScoreFromRightScore");
+                AutoTrajectory sweepTraj = routine.trajectory("sweepScoreFromRightScore");
 
                 routine.active().onTrue(
                                 Commands.sequence(

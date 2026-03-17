@@ -28,8 +28,11 @@ public class Dashboard {
         autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
         autoChooser.addRoutine("Shoot from center, then go intake through left trench", () -> auto.centerShootSweepLeft(SmartDashboard.getNumber("Seconds to wait after center shoot before intaking",0)));
         autoChooser.addRoutine("Shoot from center, then go intake through right trench", () -> auto.centerShootSweepRight(SmartDashboard.getNumber("Seconds to wait after center shoot before intaking",0)));
-        autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
-        autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
+        autoChooser.addRoutine("Left two cycle (takes full field after 10s)", auto::leftTwoCycleFullField);
+        autoChooser.addRoutine("Right two cycle (takes full field after 10s)", auto::rightTwoCycleFullField);
+        autoChooser.addRoutine("Left two cycle (uses bump)", auto::leftTwoCycleBump);
+                autoChooser.addRoutine("Right two cycle (uses bump)", auto::rightTwoCycleBump);
+
         SmartDashboard.putData("auto", autoChooser);
 
     }
