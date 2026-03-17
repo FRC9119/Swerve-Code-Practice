@@ -88,7 +88,7 @@ public class Auto {
         }
         
         public AutoRoutine centerShootSweepLeft (double seconds) {
-                AutoRoutine routine = autoFactory.newRoutine("centerShoot");
+                AutoRoutine routine = autoFactory.newRoutine("centerShootSweepLeft");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 AutoTrajectory sweepTraj = routine.trajectory("intakeLeftFromCenterScore");
@@ -103,7 +103,7 @@ public class Auto {
                 return routine;
         }
         public AutoRoutine centerShootSweepRight (double seconds) {
-                AutoRoutine routine = autoFactory.newRoutine("centerShoot");
+                AutoRoutine routine = autoFactory.newRoutine("centerShootSweepRight");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 AutoTrajectory sweepTraj = routine.trajectory("intakeRightFromCenterScore");
