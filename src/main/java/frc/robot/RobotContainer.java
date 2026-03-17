@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
-import frc.robot.subsystems.ClimberInABox;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.utils.Dashboard;
 import frc.robot.utils.LimelightHelpers;
@@ -58,9 +57,8 @@ public class RobotContainer {
         // Init Subsystems
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
-        public final ClimberInABox climbSubsystem = new ClimberInABox(drivetrain);
         // Init auto
-        public final Auto auto = new Auto(drivetrain, ballSubsystem, climbSubsystem);
+        public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
         // Init dashboard, which sends all options to SmartDashboard/Elastic
         public final Dashboard dashboard = new Dashboard(auto);
@@ -136,13 +134,6 @@ public class RobotContainer {
                                                 () -> ballSubsystem.stop()));
                 operatorController.rightTrigger().onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
                                                 () -> ballSubsystem.stop()));
-                // climb while d-pad up is pressed, come back down while d-pad down is pressed
-                operatorController.povUp().whileTrue(
-                                climbSubsystem.runEnd(() -> climbSubsystem.climb(), () -> climbSubsystem.stop()));
-                operatorController.povDown().whileTrue(
-                                climbSubsystem.runEnd(() -> climbSubsystem.release(), () -> climbSubsystem.stop()));
-operatorController.leftStick().onTrue(Commands.run(climbSubsystem::disableLimit));
-operatorController.leftStick().onFalse(Commands.run(climbSubsystem::reenableLimit));
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log. (ONLY FOR
                 // TESTING)
