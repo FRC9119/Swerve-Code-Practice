@@ -81,10 +81,41 @@ public class Auto {
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
-                                .andThen(ballSubsystem.launchCommand().withTimeout(5)));
+                                .andThen(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8)));
 
                 return routine;
 
+        }
+        
+        public AutoRoutine centerShootSweepLeft (double seconds) {
+                AutoRoutine routine = autoFactory.newRoutine("centerShoot");
+
+                AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
+                AutoTrajectory sweepTraj = routine.trajectory("intakeLeftFromCenterScore");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                scoreTraj.resetOdometry(),
+                                                scoreTraj.cmd()));
+                scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                .andThen(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8)).andThen(Commands.waitSeconds(seconds).andThen(sweepTraj.cmd())));
+
+                return routine;
+        }
+        public AutoRoutine centerShootSweepRight (double seconds) {
+                AutoRoutine routine = autoFactory.newRoutine("centerShoot");
+
+                AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
+                AutoTrajectory sweepTraj = routine.trajectory("intakeRightFromCenterScore");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                scoreTraj.resetOdometry(),
+                                                scoreTraj.cmd()));
+                scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchBang.atSetpoint())
+                                .andThen(ballSubsystem.launchCommand().withTimeout(TIME_TO_LAUNCH_8)).andThen(Commands.waitSeconds(seconds).andThen(sweepTraj.cmd())));
+
+                return routine;
         }
 
         public AutoRoutine leftTwoCycle() {

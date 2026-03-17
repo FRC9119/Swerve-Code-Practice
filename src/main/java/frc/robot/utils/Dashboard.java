@@ -19,29 +19,18 @@ public class Dashboard {
         SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
         SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
 
+        SmartDashboard.putNumber("Seconds to wait after center shoot before intaking", 0);
         // Make autoChooser with all autos and add it to dashboard
         autoChooser = new AutoChooser();
 
-<<<<<<< Updated upstream
         autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
         autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
-        autoChooser.addRoutine("Intake, shoot, climb (from left)", auto::leftIntakeShootClimb);
-        autoChooser.addRoutine("Intake, shoot, climb (from right)", auto::rightIntakeShootClimb);
         autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
-        autoChooser.addRoutine("Shoot, climb left (from center)", auto::centerShootClimbLeft);
-        autoChooser.addRoutine("Shoot, climb right (from center)", auto::centerShootClimbRight);
+        autoChooser.addRoutine("Shoot from center, then go intake through left trench", () -> auto.centerShootSweepLeft(SmartDashboard.getNumber("Seconds to wait after center shoot before intaking",0)));
+        autoChooser.addRoutine("Shoot from center, then go intake through right trench", () -> auto.centerShootSweepRight(SmartDashboard.getNumber("Seconds to wait after center shoot before intaking",0)));
         autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
         autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
-        autoChooser.addRoutine("Right three cycle", auto::rightThreeCycle);
         SmartDashboard.putData("auto", autoChooser);
-=======
-                autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
-                autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
-                autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
-                autoChooser.addRoutine("Left two cycle", auto::leftTwoCycle);
-                autoChooser.addRoutine("Right two cycle", auto::rightTwoCycle);
-                SmartDashboard.putData("auto", autoChooser);
->>>>>>> Stashed changes
 
     }
 }
