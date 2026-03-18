@@ -39,13 +39,13 @@ public class RobotContainer {
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                         // Add a 10% deadband
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+                        .withDriveRequestType(DriveRequestType.Velocity);
         // Request to drive and face hub
         private final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
                         .withHeadingPID(10, 0, 0)
                         // Add a 10% deadband
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                        .withDriveRequestType(DriveRequestType.Velocity)
                         // Flip perspective (angle and velocity) when on red
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
         // Init logging
