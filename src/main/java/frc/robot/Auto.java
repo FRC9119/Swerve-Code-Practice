@@ -3,23 +3,33 @@ package frc.robot;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_8;
 import static frc.robot.Constants.FuelConstants.TIME_TO_LAUNCH_ALL;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.utils.Targeting;
 
 public class Auto {
 
         // Choreo initialization
         public final AutoFactory autoFactory;
         public final CANFuelSubsystem ballSubsystem;
+        public final CommandSwerveDrivetrain drivetrain;
 
+        private SwerveRequest.FieldCentricFacingAngle targetHubReq = new SwerveRequest.FieldCentricFacingAngle();
+       public Command targetHub (){
+        return drivetrain.applyRequest(() -> targetHubReq.withTargetDirection(Targeting.getTargetRotation(drivetrain.getPose())));
+       }
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem) {
                 // Set the local subsystem to the subsystems passed into the constructor
                 // (real instances from RobotContainer)
                 this.ballSubsystem = ballSubsystem;
+                this.drivetrain = drivetrain;
                 // Init Choreo's autoFactory
                 autoFactory = new AutoFactory(
                                 drivetrain::getPose,
@@ -56,7 +66,7 @@ public class Auto {
                 AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake_trench");
 
                 routine.active().onTrue(
                                 Commands.sequence(

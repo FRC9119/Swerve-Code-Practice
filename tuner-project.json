@@ -209,8 +209,8 @@
       "SelectedMotorType": null
     },
     "IsValidGyroCANbus": true,
-    "VerticalTrackSizeInches": 19.5,
-    "HorizontalTrackSizeInches": 24.75,
+    "VerticalTrackSizeInches": 20,
+    "HorizontalTrackSizeInches": 25,
     "WheelRadiusInches": 2.0,
     "IsLeftSideInverted": false,
     "IsRightSideInverted": true,
@@ -227,6 +227,6 @@
     "HasVerifiedDrive": true,
     "IsValidConfiguration": true
   },
-  "TeamNumber": 0,
+  "TeamNumber": 9119,
   "schema_version": "1"
 }

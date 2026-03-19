@@ -88,7 +88,6 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
-    System.out.println(launchBang.getError());
     launchBang.setSetpoint(Targeting.getTargetRPM(drivetrain.getPose()));
 
     launcherRoller

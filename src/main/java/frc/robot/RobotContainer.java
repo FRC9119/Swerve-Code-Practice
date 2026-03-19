@@ -37,8 +37,7 @@ public class RobotContainer {
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        // Add a 10% deadband
-                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+                        .withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.Velocity);
         // Request to drive and face hub
         private final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
@@ -66,9 +65,16 @@ public class RobotContainer {
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
                 LimelightHelpers.setupPortForwardingUSB(0);
-                
+                System.out.println(MaxAngularRate);
 
                 configureBindings();
+        }
+
+        public double applyInputShaping(double joystickAxis){
+                double deadband = .05;
+                double exponent = 2;
+                if(Math.abs(joystickAxis) < deadband) return 0;
+                return Math.signum(joystickAxis) * Math.pow((Math.abs(joystickAxis)-deadband)/(1-deadband), exponent);
         }
 
         private void configureBindings() {
@@ -79,8 +85,8 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Math.atan(driverController.getRawAxis(1)) * speedScalar)
-                                                .withVelocityY(-Math.atan(driverController.getRawAxis(0)) * speedScalar)
+                                                .withVelocityX(-applyInputShaping(driverController.getRawAxis(1)) * speedScalar)
+                                                .withVelocityY(-applyInputShaping(driverController.getRawAxis(0)) * speedScalar)
                                                 .withRotationalRate(-driverController.getRawAxis(2) * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
