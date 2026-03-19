@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -61,7 +62,7 @@ public class RobotContainer {
         public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
         // Init dashboard, which sends all options to SmartDashboard/Elastic
-        public final Dashboard dashboard = new Dashboard(auto);
+        public final Dashboard dashboard = new Dashboard(auto, ballSubsystem,drivetrain);
 
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
@@ -137,10 +138,11 @@ public class RobotContainer {
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log. (ONLY FOR
                 // TESTING)
-                driverController.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                driverController.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                driverController.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                driverController.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                SysIdRoutine routine = dashboard.sysIdRoutineChooser.getSelected();
+                driverController.povUp().whileTrue(routine.dynamic(Direction.kForward));
+                driverController.povDown().whileTrue(routine.dynamic(Direction.kReverse));
+                driverController.povLeft().whileTrue(routine.quasistatic(Direction.kForward));
+                driverController.povRight().whileTrue(routine.quasistatic(Direction.kReverse));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
                 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
