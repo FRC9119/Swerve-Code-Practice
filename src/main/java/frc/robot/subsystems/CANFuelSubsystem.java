@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -13,8 +14,11 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.FuelConstants.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.utils.Targeting;
 
 public class CANFuelSubsystem extends SubsystemBase {
@@ -24,6 +28,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
   public BangBangController launchBang;
+  public SysIdRoutine sysIdFlywheelRoutine;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
@@ -32,7 +37,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller = new TalonFX(LAUNCHER_MOTOR_ID_1);
     launcherSecondary = new TalonFX(LAUNCHER_MOTOR_ID_2);
     launcherSecondary.setControl(new Follower(LAUNCHER_MOTOR_ID_1, MotorAlignmentValue.Aligned));
-    
+
     feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
     // create config for feeder CIM and apply it
@@ -44,6 +49,18 @@ public class CANFuelSubsystem extends SubsystemBase {
     launchBang.setSetpoint(DEFAULT_LAUNCH_RPM);
     // Add tolerance (amount of error that is still considered correct)
     launchBang.setTolerance(LAUNCH_TOLERANCE);
+    // Add sysId routine to get PID/FF values for flywheel
+    sysIdFlywheelRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null, // Use default ramp rate (1 V/s)
+            Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+            null, // Use default timeout (10 s)
+            // Log state with SignalLogger class
+            state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
+        new SysIdRoutine.Mechanism(
+            output -> launcherRoller.setVoltage(output.magnitude()),
+            null,
+            this));
   }
 
   // A method to set the rollers to values for intaking
@@ -93,14 +110,17 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherRoller
         .set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
   }
-  public void launchWithoutTargeting(double rpm){
+
+  public void launchWithoutTargeting(double rpm) {
     launchBang.setSetpoint(rpm);
     launcherRoller.set(launchBang.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-        intakeRoller.setVoltage(-6);
+    intakeRoller.setVoltage(-6);
 
   }
-  // Command factories to turn the spinUp method into a command that requires this subsystem
+
+  // Command factories to turn the spinUp method into a command that requires this
+  // subsystem
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
@@ -125,4 +145,5 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
+
 }
