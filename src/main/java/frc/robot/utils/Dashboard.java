@@ -40,7 +40,7 @@ public class Dashboard {
         autoChooser.addRoutine("Right two cycle (takes full field after 10s)", auto::rightTwoCycleFullField);
         autoChooser.addRoutine("Left two cycle (uses bump)", auto::leftTwoCycleBump);
         autoChooser.addRoutine("Right two cycle (uses bump)", auto::rightTwoCycleBump);
-
+        autoChooser.addRoutine("test", auto::testAim);
         SmartDashboard.putData("auto", autoChooser);
 
         sysIdRoutineChooser = new SendableChooser<SysIdRoutine>();
@@ -48,6 +48,11 @@ public class Dashboard {
         sysIdRoutineChooser.addOption("drivetrain translation", drivetrain.m_sysIdRoutineTranslation);
         sysIdRoutineChooser.addOption("drivetrain steer", drivetrain.m_sysIdRoutineSteer);
         sysIdRoutineChooser.addOption("drivetrain rotation", drivetrain.m_sysIdRoutineRotation);
+      
+      SysIdRoutine doNothing = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((v) -> {}, null,drivetrain));
+
+        sysIdRoutineChooser.setDefaultOption("nothing", doNothing);
+
         SmartDashboard.putData("sysId", sysIdRoutineChooser);
 
     }

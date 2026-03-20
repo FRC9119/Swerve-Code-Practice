@@ -63,10 +63,11 @@ public class RobotContainer {
         // Init dashboard, which sends all options to SmartDashboard/Elastic
         public final Dashboard dashboard = new Dashboard(auto, ballSubsystem, drivetrain);
 
-        public RobotContainer() {
-                // Make limelight webpage available on roboRIO IP
-                LimelightHelpers.setupPortForwardingUSB(0);
-
+        
+                public RobotContainer() {
+                        // Make limelight webpage available on roboRIO IP
+                        LimelightHelpers.setupPortForwardingUSB(0);
+                        dashboard.sysIdRoutineChooser.onChange((newRoutine) -> bindSysId(newRoutine));
                 configureBindings();
         }
 
@@ -100,7 +101,7 @@ public class RobotContainer {
                  * Otherwise run default drive SwerveRequest
                  */
                 operatorController.y().whileTrue(ballSubsystem.spinUpCommand()
-                                .until(() -> ballSubsystem.launchBang.atSetpoint())
+                                .until(() -> ballSubsystem.launchPID.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
 
                                 .whileTrue(drivetrain.applyRequest(() -> {
@@ -140,17 +141,7 @@ public class RobotContainer {
                                                 () -> ballSubsystem.stop()));
                 operatorController.rightTrigger().onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
                                                 () -> ballSubsystem.stop()));
-                // Run SysId routines using d-pad buttons while holding circle
-                // Note that each routine should be run exactly once in a single log. (ONLY FOR
-                // TESTING)
-                SysIdRoutine routine = dashboard.sysIdRoutineChooser.getSelected();
-                driverController.povUp().whileTrue(routine.dynamic(Direction.kForward));
-                driverController.povDown().whileTrue(routine.dynamic(Direction.kReverse));
-                driverController.povLeft().whileTrue(routine.quasistatic(Direction.kForward));
-                driverController.povRight().whileTrue(routine.quasistatic(Direction.kReverse));
-                // Start and end SysId logging
-                operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+                
                 // reset the field-centric heading on left bumper press
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -163,6 +154,21 @@ public class RobotContainer {
                 )));
                 // give logs to drivetrain
                 drivetrain.registerTelemetry(logger::telemeterize);
+                // Start and end SysId logging
+                operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        }
+
+        private void bindSysId(SysIdRoutine routine){
+                // Run SysId routines using d-pad buttons while holding circle
+                // Note that each routine should be run exactly once in a single log. (ONLY FOR
+                // TESTING)
+                
+                driverController.povUp().whileTrue(routine.dynamic(Direction.kForward));
+                driverController.povDown().whileTrue(routine.dynamic(Direction.kReverse));
+                driverController.povLeft().whileTrue(routine.quasistatic(Direction.kForward));
+                driverController.povRight().whileTrue(routine.quasistatic(Direction.kReverse));
+                
         }
 
 }

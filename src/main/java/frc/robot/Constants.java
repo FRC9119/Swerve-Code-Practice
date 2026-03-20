@@ -40,7 +40,7 @@ public final class Constants {
     public static final double AT_HUB_LAUNCH_RPM = 2500;
 
     // When shooter is at + or - this RPM, it is considered at its setpoint
-    public static final double LAUNCH_TOLERANCE = 5;
+    public static final double LAUNCH_TOLERANCE = .5;
 
     // PID controls for rotating bot to shoot
     public static final double SHOOT_AIM_KP = .01;
