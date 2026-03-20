@@ -37,21 +37,25 @@ public class RobotContainer {
         private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
         /* Setting up bindings for necessary control of the swerve drive platform */
-        private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+        public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                         .withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.Velocity);
         // Request to drive and face hub
-        private final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
+        public final SwerveRequest.FieldCentricFacingAngle targetHub = new SwerveRequest.FieldCentricFacingAngle()
                         .withHeadingPID(10, 0, 0)
                         // Add a 10% deadband
                         .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
                         .withDriveRequestType(DriveRequestType.Velocity)
                         // Flip perspective (angle and velocity) when on red
                         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+        // Idle while the robot is disabled. This ensures the configured
+        // neutral mode is applied to the drive motors while disabled.
+        public final SwerveRequest.Idle idle = new SwerveRequest.Idle();
+        public final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         // Init logging
         private final Telemetry logger = new Telemetry(MaxSpeed);
         // Driver Controller
-        private final CommandPS5Controller driverController = new CommandPS5Controller(0);
+        private CommandPS5Controller driverController = new CommandPS5Controller(0);
         // Operator Controller
         private final CommandXboxController operatorController = new CommandXboxController(1);
         // Init Subsystems
@@ -63,39 +67,22 @@ public class RobotContainer {
         // Init dashboard, which sends all options to SmartDashboard/Elastic
         public final Dashboard dashboard = new Dashboard(auto, ballSubsystem, drivetrain);
 
-        
         public RobotContainer() {
                 // Make limelight webpage available on roboRIO IP
                 LimelightHelpers.setupPortForwardingUSB(0);
-                        dashboard.sysIdRoutineChooser.onChange((newRoutine) -> bindSysId(newRoutine));
-                configureBindings();
-        }
+                dashboard.sysIdRoutineChooser.onChange((newRoutine) -> addSysIdBindings(newRoutine));
+                addDriverBindings();
+                addOperatorBindings();
+                addSysIdBindings(dashboard.sysIdRoutineChooser.getSelected());
 
-        public double applyInputShaping(double joystickAxis){
-                double deadband = .05;
-                double exponent = 2;
-                if(Math.abs(joystickAxis) < deadband) return 0;
-                return Math.signum(joystickAxis) * Math.pow((Math.abs(joystickAxis)-deadband)/(1-deadband), exponent);
-        }
-
-        private void configureBindings() {
-                double speedScalar = MaxSpeed * (SPEED_SCALAR + driverController.getR2Axis() * (1 - SPEED_SCALAR));
-                // Add joystick controll to swerve request
-                // Note that X is defined as forward according to WPILib convention,
-                // and Y is defined as to the left according to WPILib convention.
-                drivetrain.setDefaultCommand(
-                                // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-applyInputShaping(driverController.getRawAxis(1)) * speedScalar)
-                                                .withVelocityY(-applyInputShaping(driverController.getRawAxis(0)) * speedScalar)
-                                                .withRotationalRate(-driverController.getRawAxis(2) * MaxAngularRate)));
-
-                // Idle while the robot is disabled. This ensures the configured
-                // neutral mode is applied to the drive motors while disabled.
-                final SwerveRequest.Idle idle = new SwerveRequest.Idle();
-                final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+
+                // give logs to drivetrain
+                drivetrain.registerTelemetry(logger::telemeterize);
+        }
+
+        private void addOperatorBindings() {
                 /*
                  * While Y is held AND when constant USE_SHOOTER_LIMELIGHT is true, target hub.
                  * Otherwise run default drive SwerveRequest
@@ -111,16 +98,20 @@ public class RobotContainer {
                                                 return targetHub.withTargetDirection(
                                                                 Targeting.getTargetRotation(drivetrain.getPose()))
                                                                 .withVelocityX(-Math.atan(
-                                                                                driverController.getRawAxis(1) * MaxSpeed
+                                                                                driverController.getRawAxis(1)
+                                                                                                * MaxSpeed
                                                                                                 * SPEED_SCALAR_WHILE_TARGETING))
                                                                 .withVelocityY(-Math.atan(
-                                                                                driverController.getRawAxis(0) * MaxSpeed
+                                                                                driverController.getRawAxis(0)
+                                                                                                * MaxSpeed
                                                                                                 * SPEED_SCALAR_WHILE_TARGETING));
                                         } else
                                                 return drive.withVelocityX(
-                                                                -Math.atan(driverController.getRawAxis(1)) * speedScalar)
-                                                                .withVelocityY(-Math.atan(driverController.getRawAxis(0))
-                                                                                * speedScalar)
+                                                                -Math.atan(driverController.getRawAxis(1))
+                                                                                * SPEED_SCALAR)
+                                                                .withVelocityY(-Math
+                                                                                .atan(driverController.getRawAxis(0))
+                                                                                * SPEED_SCALAR)
                                                                 .withRotationalRate(-driverController.getRawAxis(2)
                                                                                 * MaxAngularRate);
 
@@ -137,11 +128,32 @@ public class RobotContainer {
                 operatorController.a()
                                 .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
                                                 () -> ballSubsystem.stop()));
-                operatorController.leftTrigger().onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
+                operatorController.leftTrigger()
+                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
                                                 () -> ballSubsystem.stop()));
-                operatorController.rightTrigger().onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
+                operatorController.rightTrigger()
+                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
                                                 () -> ballSubsystem.stop()));
-                
+                // Start and end SysId logging
+                operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        }
+
+        private void addDriverBindings() {
+
+                double speedScalar = MaxSpeed * (SPEED_SCALAR + driverController.getR2Axis() * (1 - SPEED_SCALAR));
+                // Add joystick controll to swerve request
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
+                drivetrain.setDefaultCommand(
+                                // Drivetrain will execute this command periodically
+                                drivetrain.applyRequest(() -> drive
+                                                .withVelocityX(-applyInputShaping(driverController.getRawAxis(1))
+                                                                * speedScalar)
+                                                .withVelocityY(-applyInputShaping(driverController.getRawAxis(0))
+                                                                * speedScalar)
+                                                .withRotationalRate(-driverController.getRawAxis(2) * MaxAngularRate)));
+
                 // reset the field-centric heading on left bumper press
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -150,25 +162,29 @@ public class RobotContainer {
                 // get alliance and make sure it exists
                 DriverStation.getAlliance().ifPresent((alliance) ->
                 // set gyro to 0 if blue, 180 if red
-                drivetrain.getPigeon2().setYaw(alliance == Alliance.Blue ? 0 : 180)
-                )));
-                // give logs to drivetrain
-                drivetrain.registerTelemetry(logger::telemeterize);
-                // Start and end SysId logging
-                operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+                drivetrain.getPigeon2().setYaw(alliance == Alliance.Blue ? 0 : 180))));
         }
 
-        private void bindSysId(SysIdRoutine routine){
+        private void addSysIdBindings(SysIdRoutine routine) {
                 // Run SysId routines using d-pad buttons while holding circle
                 // Note that each routine should be run exactly once in a single log. (ONLY FOR
                 // TESTING)
-                
+                driverController = new CommandPS5Controller(0);
+                addDriverBindings();
                 driverController.povUp().whileTrue(routine.dynamic(Direction.kForward));
                 driverController.povDown().whileTrue(routine.dynamic(Direction.kReverse));
                 driverController.povLeft().whileTrue(routine.quasistatic(Direction.kForward));
                 driverController.povRight().whileTrue(routine.quasistatic(Direction.kReverse));
-                
+
+        }
+
+        public double applyInputShaping(double joystickAxis) {
+                double deadband = .05;
+                double exponent = 2;
+                if (Math.abs(joystickAxis) < deadband)
+                        return 0;
+                return Math.signum(joystickAxis)
+                                * Math.pow((Math.abs(joystickAxis) - deadband) / (1 - deadband), exponent);
         }
 
 }
