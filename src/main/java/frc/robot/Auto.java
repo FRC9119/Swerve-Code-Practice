@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -50,7 +51,7 @@ public class Auto {
                 AutoRoutine routine = autoFactory.newRoutine("leftIntakeShoot");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake_trench");
 
                 routine.active().onTrue(
                                 Commands.sequence(
@@ -59,7 +60,7 @@ public class Auto {
 
                 intakeTraj.done().onTrue(scoreTraj.cmd());
 
-                scoreTraj.done().onTrue(ballSubsystem.launchCommand());
+                scoreTraj.done().onTrue(ballSubsystem.launchCommand().alongWith(targetHub()));
 
                 return routine;
 
@@ -84,12 +85,6 @@ public class Auto {
 
         }
 
-        public AutoRoutine testAim() {
-                AutoRoutine routine = autoFactory.newRoutine("test");
-                routine.active().onTrue(targetHub());
-                return routine;
-        }
-
         public AutoRoutine centerShoot() {
                 AutoRoutine routine = autoFactory.newRoutine("centerShoot");
 
@@ -106,36 +101,40 @@ public class Auto {
 
         }
 
-        public AutoRoutine centerShootSweepLeft(double seconds) {
+        public AutoRoutine centerShootSweepLeft() {
                 AutoRoutine routine = autoFactory.newRoutine("centerShootSweepLeft");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 AutoTrajectory sweepTraj = routine.trajectory("intakeLeftFromCenterScore");
 
+                double secondsToWait = SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0);
+
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchPID.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand().alongWith(targetHub()).withTimeout(TIME_TO_LAUNCH_8))
-                                .andThen(Commands.waitSeconds(seconds).andThen(sweepTraj.cmd())));
+                                .andThen(Commands.waitSeconds(secondsToWait).andThen(sweepTraj.cmd())));
 
                 return routine;
         }
 
-        public AutoRoutine centerShootSweepRight(double seconds) {
+        public AutoRoutine centerShootSweepRight() {
                 AutoRoutine routine = autoFactory.newRoutine("centerShootSweepRight");
 
                 AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
                 AutoTrajectory sweepTraj = routine.trajectory("intakeRightFromCenterScore");
 
+                double secondsToWait = SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0);
+
                 routine.active().onTrue(
                                 Commands.sequence(
                                                 scoreTraj.resetOdometry(),
                                                 scoreTraj.cmd()));
                 scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchPID.atSetpoint())
                                 .andThen(ballSubsystem.launchCommand().alongWith(targetHub()).withTimeout(TIME_TO_LAUNCH_8))
-                                .andThen(Commands.waitSeconds(seconds).andThen(sweepTraj.cmd())));
+                                .andThen(Commands.waitSeconds(secondsToWait).andThen(sweepTraj.cmd())));
 
                 return routine;
         }
