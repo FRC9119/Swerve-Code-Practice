@@ -64,9 +64,9 @@ public class RobotContainer {
         public final Dashboard dashboard = new Dashboard(auto, ballSubsystem, drivetrain);
 
         
-                public RobotContainer() {
-                        // Make limelight webpage available on roboRIO IP
-                        LimelightHelpers.setupPortForwardingUSB(0);
+        public RobotContainer() {
+                // Make limelight webpage available on roboRIO IP
+                LimelightHelpers.setupPortForwardingUSB(0);
                         dashboard.sysIdRoutineChooser.onChange((newRoutine) -> bindSysId(newRoutine));
                 configureBindings();
         }
@@ -146,9 +146,9 @@ public class RobotContainer {
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
                 // zero gyro yaw on right bumper press
-                driverController.R1().onTrue(drivetrain.runOnce(() -> 
+                driverController.R1().onTrue(drivetrain.runOnce(() ->
                 // get alliance and make sure it exists
-                DriverStation.getAlliance().ifPresent((alliance) -> 
+                DriverStation.getAlliance().ifPresent((alliance) ->
                 // set gyro to 0 if blue, 180 if red
                 drivetrain.getPigeon2().setYaw(alliance == Alliance.Blue ? 0 : 180)
                 )));

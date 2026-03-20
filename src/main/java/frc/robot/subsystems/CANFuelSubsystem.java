@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
-import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,8 +29,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
   public PIDController launchPID;
-  public SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835/60,0);
+  public SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
   public SysIdRoutine sysIdFlywheelRoutine;
+  public double setpointRPS = DEFAULT_LAUNCH_RPM/60;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
@@ -49,7 +49,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller.configAllSettings(feederConfig);
     // Create bang-bang controller and add a setpoint (goal)
     launchPID = new PIDController(0.181,0,0);
-    launchPID.setSetpoint(DEFAULT_LAUNCH_RPM);
+    launchPID.setSetpoint(setpointRPS);
     // Add tolerance (amount of error that is still considered correct)
     launchPID.setTolerance(LAUNCH_TOLERANCE);
     
@@ -93,13 +93,12 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // A method to set the rollers to values for launching.
   public void launch() {
-    double setpoint = Targeting.getTargetRPM(drivetrain.getPose());
-    launchPID.setSetpoint(setpoint/60);
-    System.out.println(launchPID.getError());
+    setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
+    launchPID.setSetpoint(setpointRPS);
     intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     launcherRoller
-        .setVoltage(launchFF.calculate(setpoint) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
   // A method to stop the rollers
@@ -112,17 +111,18 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
-    double setpoint = Targeting.getTargetRPM(drivetrain.getPose());
+    setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
     intakeRoller.setVoltage(3);
     
-     launchPID.setSetpoint(setpoint/60);
+     launchPID.setSetpoint(setpointRPS);
     launcherRoller
-        .setVoltage(launchFF.calculate(setpoint) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
   public void launchWithoutTargeting(double rpm) {
-    launchPID.setSetpoint(rpm);
-    launcherRoller.setVoltage(launchFF.calculate(rpm) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble() * 60));
+    double rps = rpm/60;
+    launchPID.setSetpoint(rps);
+    launcherRoller.setVoltage(launchFF.calculate(rps) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeRoller.setVoltage(-6);
 

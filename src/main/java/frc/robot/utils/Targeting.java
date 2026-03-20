@@ -28,7 +28,7 @@ public class Targeting {
     return new Rotation2d(bluePose.getX() - HUB_X_COORD, bluePose.getY() - HUB_Y_COORD);
   }
 
-  public static double getTargetRPM(Pose2d pose) {
+  public static double getTargetRPS(Pose2d pose) {
     if (!USE_SHOOTER_LIMELIGHT)
       return DEFAULT_LAUNCH_RPM;
 
@@ -37,8 +37,9 @@ public class Targeting {
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y)).minus(coordinates)
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
+    System.out.println(distance);
     // equation from spreadsheet measurements
-    return SmartDashboard.getNumber("slope", 650) * distance + SmartDashboard.getNumber("intercept", 1900);
+    return (SmartDashboard.getNumber("slope", 650) * distance + SmartDashboard.getNumber("intercept", 1900) )/60;
   }
 
 }
