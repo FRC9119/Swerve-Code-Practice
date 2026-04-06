@@ -215,7 +215,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         );
         
         // Apply the generated speeds
-        this.setControl(m_pathApplyFieldSpeeds.withSpeeds(speeds));
+        this.setControl(m_pathApplyFieldSpeeds.withSpeeds(speeds).withWheelForceFeedforwardsX(sample.moduleForcesX()).withWheelForceFeedforwardsY(sample.moduleForcesY()));
     }
     public Pose2d getPose() {
         return this.getState().Pose;
