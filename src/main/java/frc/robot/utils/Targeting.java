@@ -1,6 +1,6 @@
 package frc.robot.utils;
 
-import static frc.robot.Constants.FuelConstants.DEFAULT_LAUNCH_RPM;
+import static frc.robot.Constants.FuelConstants.DEFAULT_LAUNCH_RPS;
 import static frc.robot.Constants.FuelConstants.FULL_FIELD_X;
 import static frc.robot.Constants.FuelConstants.FULL_FIELD_Y;
 import static frc.robot.Constants.FuelConstants.HUB_X_COORD;
@@ -30,7 +30,7 @@ public class Targeting {
 
   public static double getTargetRPS(Pose2d pose) {
     if (!USE_SHOOTER_LIMELIGHT)
-      return DEFAULT_LAUNCH_RPM;
+      return DEFAULT_LAUNCH_RPS;
 
     Translation2d coordinates = pose.getTranslation();
     Translation2d blueCoordinates = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
@@ -38,8 +38,9 @@ public class Targeting {
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
     System.out.println(distance);
+    //return SmartDashboard.getNumber("Default Launch RPS",0);
     // equation from spreadsheet measurements
-    return (SmartDashboard.getNumber("slope", 650) * distance + SmartDashboard.getNumber("intercept", 1900) )/60;
+    return (SmartDashboard.getNumber("slope", 9.9) * distance + SmartDashboard.getNumber("intercept", 30.78) );
   }
 
 }

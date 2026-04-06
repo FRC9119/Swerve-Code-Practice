@@ -22,7 +22,9 @@ public class Dashboard {
     SmartDashboard.putNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
     SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
-    SmartDashboard.putNumber("Default Launch RPM", DEFAULT_LAUNCH_RPM);
+    SmartDashboard.putNumber("Default Launch RPS", DEFAULT_LAUNCH_RPS);
+SmartDashboard.putNumber("slope", 9.9);
+SmartDashboard.putNumber("intercept", 30.78);
 
     SmartDashboard.putNumber("Seconds to wait after center shoot before intaking", 0);
     // Make autoChooser with all autos and add it to dashboard

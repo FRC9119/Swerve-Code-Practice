@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -23,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.utils.Targeting;
 
 public class CANFuelSubsystem extends SubsystemBase {
-  private final WPI_TalonSRX feederRoller;
+  private final TalonFX feederRoller;
   private final TalonFX launcherRoller;
   private final TalonFX launcherSecondary;
   private final TalonFX intakeRoller;
@@ -31,7 +29,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public PIDController launchPID;
   public SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
   public SysIdRoutine sysIdFlywheelRoutine;
-  public double setpointRPS = DEFAULT_LAUNCH_RPM/60;
+  public double setpointRPS = DEFAULT_LAUNCH_RPS/60;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
@@ -41,12 +39,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherSecondary = new TalonFX(LAUNCHER_MOTOR_ID_2);
     launcherSecondary.setControl(new Follower(LAUNCHER_MOTOR_ID_1, MotorAlignmentValue.Aligned));
 
-    feederRoller = new WPI_TalonSRX(FEEDER_MOTOR_ID);
+    feederRoller = new TalonFX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
-    // create config for feeder CIM and apply it
-    TalonSRXConfiguration feederConfig = new TalonSRXConfiguration();
-    feederConfig.peakCurrentLimit = FEEDER_MOTOR_CURRENT_LIMIT;
-    feederRoller.configAllSettings(feederConfig);
+    
     // Create bang-bang controller and add a setpoint (goal)
     launchPID = new PIDController(0.181,0,0);
     launchPID.setSetpoint(setpointRPS);
@@ -112,7 +107,6 @@ public class CANFuelSubsystem extends SubsystemBase {
   // push Fuel away from the launcher
   public void spinUp() {
     setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
-    intakeRoller.setVoltage(3);
     
      launchPID.setSetpoint(setpointRPS);
     launcherRoller

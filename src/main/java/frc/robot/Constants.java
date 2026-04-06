@@ -32,11 +32,11 @@ public final class Constants {
     // See the Software Guide for tuning information
     public static final double INTAKING_FEEDER_VOLTAGE = 8;
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
-    public static final double LAUNCHING_FEEDER_VOLTAGE = 10;
+    public static final double LAUNCHING_FEEDER_VOLTAGE = 8.8;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
   
     // RPMs for shooter
-    public static final double DEFAULT_LAUNCH_RPM = 3500;
+    public static final double DEFAULT_LAUNCH_RPS = 3500;
     public static final double AT_HUB_LAUNCH_RPM = 2500;
 
     // When shooter is at + or - this RPM, it is considered at its setpoint

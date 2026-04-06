@@ -241,7 +241,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         boolean rotatingTooFast = Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 10;
-        if(!rotatingTooFast && USE_SHOOTER_LIMELIGHT){
+        if(!rotatingTooFast && USE_SHOOTER_LIMELIGHT && DriverStation.isEnabled()){
             double yaw = this.getPigeon2().getYaw().getValueAsDouble();          
             LimelightHelpers.SetRobotOrientation("limelight-shoot",
             yaw,0.0,0.0,0.0,0.0,0.0);
