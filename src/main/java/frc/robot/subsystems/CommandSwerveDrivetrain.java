@@ -241,19 +241,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         boolean rotatingTooFast = Math.abs(this.getState().Speeds.omegaRadiansPerSecond) > 10;
-        if(!rotatingTooFast && USE_SHOOTER_LIMELIGHT && DriverStation.isEnabled()){
-            double yaw = this.getPigeon2().getYaw().getValueAsDouble();          
+        if(!rotatingTooFast && USE_SHOOTER_LIMELIGHT){
+            double yaw = this.getPigeon2().getYaw().getValueAsDouble();
+            double pitch = this.getPigeon2().getPitch().getValueAsDouble();
+            double roll = this.getPigeon2().getRoll().getValueAsDouble();          
             LimelightHelpers.SetRobotOrientation("limelight-shoot",
-            yaw,0.0,0.0,0.0,0.0,0.0);
+            yaw,0.0,pitch,0.0,roll,0.0);
             LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
-
-            if(mt2.tagCount != 0){
-                this.addVisionMeasurement(mt2.pose, Timer.getFPGATimestamp());
-            }
-           
             
+            if(mt2.tagCount != 0){
+                this.addVisionMeasurement(useGyroRotation(mt2.pose), Timer.getFPGATimestamp());
+            }
+                   
         }
-        //         this.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("climb").pose, Timer.getFPGATimestamp());
+    }
+
+    public Pose2d useGyroRotation(Pose2d pose){
+        return new Pose2d(pose.getTranslation(),this.getPigeon2().getRotation2d());
     }
 
     private void startSimThread() {
