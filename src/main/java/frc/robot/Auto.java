@@ -74,7 +74,7 @@ public Command launchSequence(){
                 AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
 
                 AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake");
+                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake_trench");
 
                 routine.active().onTrue(
                                 Commands.sequence(
