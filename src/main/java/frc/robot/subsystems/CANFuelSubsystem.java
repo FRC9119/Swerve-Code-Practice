@@ -26,9 +26,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final TalonFX launcherSecondary;
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
-  public PIDController launchPID;
-  public SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
-  public SysIdRoutine sysIdFlywheelRoutine;
+  public final  PIDController launchPID;
+  public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
+  public final SysIdRoutine sysIdFlywheelRoutine;
   public double setpointRPS = DEFAULT_LAUNCH_RPS/60;
 
   /** Creates a new CANBallSubsystem. */
