@@ -85,7 +85,7 @@ public class TunerConstants {
 
     // Should be tuned to your robot using straight line test
     // (Theoretical radius) * (Measured distance) / (Pose Distance)
-    private static final Distance kWheelRadius = Inches.of(1.88);
+    private static final Distance kWheelRadius = Inches.of(1.918);
 
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = true;
