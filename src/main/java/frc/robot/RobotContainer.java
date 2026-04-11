@@ -118,16 +118,13 @@ public class RobotContainer {
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
                 operatorController.b()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.ejectCommand());
                 // Run intake() periodically while X is pressed
                 operatorController.x()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.intakeCommand());
                 // Run unclog() periodically while X is pressed
                 operatorController.a()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.unclogCommand());
                 operatorController.leftTrigger()
                                 .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
                                                 () -> ballSubsystem.stop()));
@@ -152,7 +149,7 @@ public class RobotContainer {
                                                                 * speedScalar)
                                                 .withVelocityY(-applyInputShaping(driverController.getRawAxis(0))
                                                                 * speedScalar)
-                                                .withRotationalRate(-driverController.getRawAxis(2) * MaxAngularRate)));
+                                                .withRotationalRate(-applyInputShaping(driverController.getRawAxis(2)) * MaxAngularRate)));
 
                 // reset the field-centric heading on left bumper press
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

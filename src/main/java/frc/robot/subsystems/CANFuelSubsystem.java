@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.FuelConstants.*;
@@ -128,10 +129,16 @@ public class CANFuelSubsystem extends SubsystemBase {
     return this.run(() -> spinUp());
   }
 
-  public Command intakeCommand() {
+  public Command intakeWithUnclogCommand() {
+    return Commands.sequence(intakeCommand().withTimeout(1),ejectCommand().withTimeout(.1));
+  }
+  public Command intakeCommand(){
     return this.run(() -> intake());
   }
 
+public Command ejectCommand(){
+  return this.run(() -> eject());
+}
   public Command launchCommand() {
     return this.run(() -> launch());
   }
