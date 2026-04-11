@@ -247,10 +247,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double roll = this.getPigeon2().getRoll().getValueAsDouble();          
             LimelightHelpers.SetRobotOrientation("limelight-shoot",
             yaw,0.0,pitch,0.0,roll,0.0);
-            LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
+            LimelightHelpers.SetRobotOrientation("limelight-intake",
+            yaw,0.0,pitch,0.0,roll,0.0);
+            LimelightHelpers.PoseEstimate intakeCamEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-intake");
+            LimelightHelpers.PoseEstimate shootCamEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
             
-            if(mt2.tagCount != 0){
-                this.addVisionMeasurement(useGyroRotation(mt2.pose), Timer.getFPGATimestamp());
+            if(intakeCamEstimate.tagCount != 0){
+                this.addVisionMeasurement(useGyroRotation(intakeCamEstimate.pose), Timer.getFPGATimestamp());
+            }
+
+            if(shootCamEstimate.tagCount != 0){
+                this.addVisionMeasurement(useGyroRotation(shootCamEstimate.pose), Timer.getFPGATimestamp());
             }
                    
         }
