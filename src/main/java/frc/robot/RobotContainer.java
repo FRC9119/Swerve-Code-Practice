@@ -53,7 +53,7 @@ public class RobotContainer {
         public final SwerveRequest.Idle idle = new SwerveRequest.Idle();
         public final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         // Init logging
-        private final Telemetry logger = new Telemetry(MaxSpeed);
+        public final Telemetry logger = new Telemetry(MaxSpeed);
         // Driver Controller
         private CommandPS5Controller driverController = new CommandPS5Controller(0);
         // Operator Controller
@@ -79,7 +79,7 @@ public class RobotContainer {
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
                 // give logs to drivetrain
-                drivetrain.registerTelemetry(logger::telemeterize);
+                drivetrain.registerTelemetry(logger::telemeterizeDriveState);
         }
 
         private void addOperatorBindings() {
@@ -118,13 +118,16 @@ public class RobotContainer {
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
                 operatorController.b()
-                                .whileTrue(ballSubsystem.ejectCommand());
+                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
+                                                () -> ballSubsystem.stop()));
                 // Run intake() periodically while X is pressed
                 operatorController.x()
-                                .whileTrue(ballSubsystem.intakeCommand());
+                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(),
+                                                () -> ballSubsystem.stop()));
                 // Run unclog() periodically while X is pressed
                 operatorController.a()
-                                .whileTrue(ballSubsystem.unclogCommand());
+                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
+                                                () -> ballSubsystem.stop()));
                 operatorController.leftTrigger()
                                 .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
                                                 () -> ballSubsystem.stop()));

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.subsystems.CANFuelSubsystem;
 
 public class Telemetry {
     private final double MaxSpeed;
@@ -50,11 +51,22 @@ public class Telemetry {
     private final StructArrayPublisher<SwerveModulePosition> driveModulePositions = driveStateTable.getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
     private final DoublePublisher driveTimestamp = driveStateTable.getDoubleTopic("Timestamp").publish();
     private final DoublePublisher driveOdometryFrequency = driveStateTable.getDoubleTopic("OdometryFrequency").publish();
+    
+
 
     /* Robot pose for field positioning */
     private final NetworkTable table = inst.getTable("Pose");
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+
+private final NetworkTable visionTable = inst.getTable("Vision");
+private final StructPublisher<Pose2d> shootCamPosePub = visionTable.getStructTopic("shootCamPose", Pose2d.struct).publish();
+private final StructPublisher<Pose2d> intakeCamPosePub = visionTable.getStructTopic("intakeCamPose", Pose2d.struct).publish();
+
+private final NetworkTable fuelSubsytemTable = inst.getTable("FuelSubsystem");
+private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
+
+
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
@@ -87,7 +99,7 @@ public class Telemetry {
     private final double[] m_moduleTargetsArray = new double[8];
 
     /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
-    public void telemeterize(SwerveDriveState state) {
+    public void telemeterizeDriveState(SwerveDriveState state) {
         /* Telemeterize the swerve drive state */
         drivePose.set(state.Pose);
         driveSpeeds.set(state.Speeds);
@@ -123,5 +135,26 @@ public class Telemetry {
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
         }
+
+        LimelightHelpers.PoseEstimate shootCamPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
+        LimelightHelpers.PoseEstimate intakeCamPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-intake");
+        
+        if(shootCamPose.tagCount != 0){
+            shootCamPosePub.set(shootCamPose.pose);
+            SignalLogger.writeStruct("Vision/shootCamPose", Pose2d.struct, shootCamPose.pose);
+        }
+
+        if(intakeCamPose.tagCount != 0){
+            intakeCamPosePub.set(intakeCamPose.pose);
+            SignalLogger.writeStruct("Vision/intakeCamPose", Pose2d.struct, intakeCamPose.pose);
+        }
+
+
+    }
+
+    public void telemeterizeFuelSubsystem(CANFuelSubsystem ballSubsystem){
+
+        flywheelTargetPub.set(ballSubsystem.setpointRPS);
+        SignalLogger.writeDouble("FuelSubsystem/flywheelTarget", ballSubsystem.setpointRPS);
     }
 }
