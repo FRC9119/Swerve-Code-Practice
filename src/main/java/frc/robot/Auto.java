@@ -33,6 +33,10 @@ public Command launchSequence(){
                                 .withTargetDirection(Targeting.getTargetRotation(drivetrain.getPose())));
         }
 
+        public String safeOrRiskyPath(){
+                return SmartDashboard.getBoolean("Can we win the auto race?", true) ? "_risky" : "_safe";
+        }
+
         public Auto(CommandSwerveDrivetrain drivetrain, CANFuelSubsystem ballSubsystem) {
                 // Set the local subsystem to the subsystems passed into the constructor
                 // (real instances from RobotContainer)
@@ -51,186 +55,116 @@ public Command launchSequence(){
                 autoFactory.bind("spinup", ballSubsystem.spinUpCommand());
         }
 
-        public AutoRoutine leftIntakeShoot() {
-                AutoRoutine routine = autoFactory.newRoutine("leftIntakeShoot");
+        public AutoRoutine oneCycleLeft() {
+                AutoRoutine routine = autoFactory.newRoutine("oneCycleLeft");
 
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake_trench");
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Left"+safeOrRiskyPath());
 
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
 
-                intakeTraj.chain(scoreTraj);
-
-                scoreTraj.done().onTrue(launchSequence());
+                cycle1Traj.done().onTrue(launchSequence());
 
                 return routine;
 
         }
 
-        public AutoRoutine rightIntakeShoot() {
-                AutoRoutine routine = autoFactory.newRoutine("rightIntakeShoot");
+        public AutoRoutine oneCycleRight() {
+                AutoRoutine routine = autoFactory.newRoutine("oneCycleRight");
 
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake_trench");
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Right"+safeOrRiskyPath());
 
                 routine.active().onTrue(
                                 Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
 
-                intakeTraj.chain(scoreTraj);
+                cycle1Traj.done().onTrue(launchSequence());
 
-                scoreTraj.done().onTrue(launchSequence());
+                return routine;
+
+        }
+         public AutoRoutine twoCycleLeft() {
+                AutoRoutine routine = autoFactory.newRoutine("twoCycleLeft");
+
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Left"+safeOrRiskyPath());
+                AutoTrajectory cycle2Traj = routine.trajectory("cycle2Left_singleTrench");
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
+
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL).andThen(cycle2Traj.cmd()));
+                cycle2Traj.done().onTrue(launchSequence());
+                return routine;
+
+        }
+        public AutoRoutine twoCycleRight() {
+                AutoRoutine routine = autoFactory.newRoutine("twoCycleRight");
+
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Right"+safeOrRiskyPath());
+                AutoTrajectory cycle2Traj = routine.trajectory("cycle2Right_singleTrench");
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
+
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL).andThen(cycle2Traj.cmd().asProxy()));
+                cycle2Traj.done().onTrue(launchSequence());
+                return routine;
+
+        }
+
+
+        public AutoRoutine oneCycleCenter() {
+                AutoRoutine routine = autoFactory.newRoutine("oneCycleCenter");
+
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Center");
+
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8));
+
+                return routine;
+
+        }
+        public AutoRoutine twoCycleCenterToLeft() {
+                AutoRoutine routine = autoFactory.newRoutine("twoCycleCenterToLeft");
+
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Center");
+                AutoTrajectory cycle2Traj = routine.trajectory("cycle2CenterToLeft");
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd()));
+                
+                cycle2Traj.done().onTrue(launchSequence());
+
+                return routine;
+
+        }
+        public AutoRoutine twoCycleCenterToRight() {
+                AutoRoutine routine = autoFactory.newRoutine("twoCycleCenterToRight");
+
+                AutoTrajectory cycle1Traj = routine.trajectory("cycle1Center");
+                AutoTrajectory cycle2Traj = routine.trajectory("cycle2CenterToRight");
+                routine.active().onTrue(
+                                Commands.sequence(
+                                                cycle1Traj.resetOdometry(),
+                                                cycle1Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd()));
+                
+                cycle2Traj.done().onTrue(launchSequence());
 
                 return routine;
 
         }
 
-        public AutoRoutine centerShoot() {
-                AutoRoutine routine = autoFactory.newRoutine("centerShoot");
 
-                AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
-                scoreTraj.done().onTrue(ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchPID.atSetpoint())
-                                .andThen(ballSubsystem.launchCommand().alongWith(targetHub()).withTimeout(TIME_TO_LAUNCH_8)));
-
-                return routine;
-
-        }
-
-        public AutoRoutine centerShootSweepLeft() {
-                AutoRoutine routine = autoFactory.newRoutine("centerShootSweepLeft");
-
-                AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
-                AutoTrajectory sweepTraj = routine.trajectory("intakeLeftFromCenterScore");
-
-                double secondsToWait = SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0);
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
-                scoreTraj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8)
-                                .andThen(Commands.waitSeconds(secondsToWait).andThen(sweepTraj.cmd().asProxy())));
-
-                return routine;
-        }
-
-        public AutoRoutine centerShootSweepRight() {
-                AutoRoutine routine = autoFactory.newRoutine("centerShootSweepRight");
-
-                AutoTrajectory scoreTraj = routine.trajectory("scoreFromCenter");
-                AutoTrajectory sweepTraj = routine.trajectory("intakeRightFromCenterScore");
-
-                double secondsToWait = SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0);
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                scoreTraj.resetOdometry(),
-                                                scoreTraj.cmd()));
-                scoreTraj.done().onTrue(launchSequence()
-                                .withTimeout(TIME_TO_LAUNCH_8)
-                                .andThen(Commands.waitSeconds(secondsToWait).andThen(sweepTraj.cmd().asProxy())));
-
-                return routine;
-        }
-
-        public AutoRoutine leftTwoCycleFullField() {
-                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycleFullField");
-
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake_trench");
-                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromLeftScore");
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                intakeTraj.chain(scoreTraj);
-
-                scoreTraj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL)
-                                .andThen(sweepAndScoreTraj.cmd().asProxy()));
-
-                sweepAndScoreTraj.done()
-                                .onTrue(launchSequence());
-
-                return routine;
-        }
-
-        public AutoRoutine leftTwoCycleBump() {
-                AutoRoutine routine = autoFactory.newRoutine("leftTwoCycleBump");
-
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromLeft");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterLeftIntake_trench");
-                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromLeftScore_bump");
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                intakeTraj.chain(scoreTraj);
-
-                scoreTraj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL)
-                                .andThen(sweepAndScoreTraj.cmd().asProxy()));
-
-                sweepAndScoreTraj.done()
-                                .onTrue(launchSequence());
-
-                return routine;
-        }
-
-        public AutoRoutine rightTwoCycleBump() {
-                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycleBump");
-
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake_trench");
-                AutoTrajectory sweepAndScoreTraj = routine.trajectory("sweepScoreFromRightScore_bump");
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                intakeTraj.chain(scoreTraj);
-
-                scoreTraj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL)
-                                .andThen(sweepAndScoreTraj.cmd().asProxy()));
-
-                sweepAndScoreTraj.done()
-                                .onTrue(launchSequence());
-
-                return routine;
-        }
-
-        public AutoRoutine rightTwoCycleFullField() {
-                AutoRoutine routine = autoFactory.newRoutine("rightTwoCycleFullField");
-
-                AutoTrajectory intakeTraj = routine.trajectory("intakeFromRight");
-                AutoTrajectory scoreTraj = routine.trajectory("scoreAfterRightIntake_trench");
-                AutoTrajectory sweepTraj = routine.trajectory("sweepScoreFromRightScore");
-
-                routine.active().onTrue(
-                                Commands.sequence(
-                                                intakeTraj.resetOdometry(),
-                                                intakeTraj.cmd()));
-
-                intakeTraj.chain(scoreTraj);
-
-                scoreTraj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL)
-                                .andThen(sweepTraj.cmd().asProxy()));
-                sweepTraj.done()
-                                .onTrue(launchSequence());
-
-                return routine;
-        }
 
 }

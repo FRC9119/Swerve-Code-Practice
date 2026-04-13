@@ -30,16 +30,17 @@ SmartDashboard.putNumber("intercept", 30.78);
     // Make autoChooser with all autos and add it to dashboard
     autoChooser = new AutoChooser();
 
-    autoChooser.addRoutine("Intake, shoot (from left)", auto::leftIntakeShoot);
-    autoChooser.addRoutine("Intake, shoot (from right)", auto::rightIntakeShoot);
-    autoChooser.addRoutine("Shoot (from center)", auto::centerShoot);
-    autoChooser.addRoutine("Shoot from center, then go intake through left trench", auto::centerShootSweepLeft);
-    autoChooser.addRoutine("Shoot from center, then go intake through right trench", auto::centerShootSweepRight);
-    autoChooser.addRoutine("Left two cycle (takes full field after 10s)", auto::leftTwoCycleFullField);
-    autoChooser.addRoutine("Right two cycle (takes full field after 10s)", auto::rightTwoCycleFullField);
-    autoChooser.addRoutine("Left two cycle (uses bump)", auto::leftTwoCycleBump);
-    autoChooser.addRoutine("Right two cycle (uses bump)", auto::rightTwoCycleBump);
+    autoChooser.addRoutine("One Cycle (Left)", auto::oneCycleLeft);
+    autoChooser.addRoutine("One Cycle (Right)", auto::oneCycleRight);
+    autoChooser.addRoutine("One Cycle (Center)", auto::oneCycleCenter);
+    autoChooser.addRoutine("Two Cycle (Left)", auto::twoCycleLeft);
+    autoChooser.addRoutine("Two Cycle (Right)", auto::twoCycleRight);
+    autoChooser.addRoutine("Two Cycle (Center to Left)", auto::twoCycleCenterToLeft);
+    autoChooser.addRoutine("Two Cycle (Center to Right)", auto::twoCycleCenterToRight);
     SmartDashboard.putData("auto", autoChooser);
+
+SmartDashboard.putBoolean("Can we win the auto race?", true);
+
 
     sysIdRoutineChooser = new SendableChooser<SysIdRoutine>();
     sysIdRoutineChooser.addOption("flywheel", ballSubsystem.sysIdFlywheelRoutine);
