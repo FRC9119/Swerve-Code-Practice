@@ -7,9 +7,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -43,55 +45,65 @@ public class Telemetry {
     /* Robot swerve drive state */
     private final NetworkTable driveStateTable = inst.getTable("DriveState");
     private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct).publish();
-    private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable.getStructTopic("Speeds", ChassisSpeeds.struct).publish();
-    private final StructArrayPublisher<SwerveModuleState> driveModuleStates = driveStateTable.getStructArrayTopic("ModuleStates", SwerveModuleState.struct).publish();
-    private final StructArrayPublisher<SwerveModuleState> driveModuleTargets = driveStateTable.getStructArrayTopic("ModuleTargets", SwerveModuleState.struct).publish();
-    private final StructArrayPublisher<SwerveModulePosition> driveModulePositions = driveStateTable.getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
+    private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable
+            .getStructTopic("Speeds", ChassisSpeeds.struct).publish();
+    private final StructArrayPublisher<SwerveModuleState> driveModuleStates = driveStateTable
+            .getStructArrayTopic("ModuleStates", SwerveModuleState.struct).publish();
+    private final StructArrayPublisher<SwerveModuleState> driveModuleTargets = driveStateTable
+            .getStructArrayTopic("ModuleTargets", SwerveModuleState.struct).publish();
+    private final StructArrayPublisher<SwerveModulePosition> driveModulePositions = driveStateTable
+            .getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
     private final DoublePublisher driveTimestamp = driveStateTable.getDoubleTopic("Timestamp").publish();
-    private final DoublePublisher driveOdometryFrequency = driveStateTable.getDoubleTopic("OdometryFrequency").publish();
-    
+    private final DoublePublisher driveOdometryFrequency = driveStateTable.getDoubleTopic("OdometryFrequency")
+            .publish();
 
+    /* Robot pose for field positioning */
+    private final NetworkTable table = inst.getTable("Pose");
+    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
+    private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
+    private final NetworkTable visionTable = inst.getTable("Vision");
+    private final StructPublisher<Pose2d> shootCamPosePub = visionTable.getStructTopic("shootCamPose", Pose2d.struct)
+            .publish();
+    private final StructPublisher<Pose2d> intakeCamPosePub = visionTable.getStructTopic("intakeCamPose", Pose2d.struct)
+            .publish();
 
-private final NetworkTable visionTable = inst.getTable("Vision");
-private final StructPublisher<Pose2d> shootCamPosePub = visionTable.getStructTopic("shootCamPose", Pose2d.struct).publish();
-private final StructPublisher<Pose2d> intakeCamPosePub = visionTable.getStructTopic("intakeCamPose", Pose2d.struct).publish();
-
-private final NetworkTable fuelSubsytemTable = inst.getTable("FuelSubsystem");
-private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
-
-
+    private final NetworkTable fuelSubsytemTable = inst.getTable("FuelSubsystem");
+    private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
+            new Mechanism2d(1, 1),
+            new Mechanism2d(1, 1),
+            new Mechanism2d(1, 1),
+            new Mechanism2d(1, 1),
     };
     /* A direction and length changing ligament for speed representation */
     private final MechanismLigament2d[] m_moduleSpeeds = new MechanismLigament2d[] {
-        m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[1].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[1].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
     };
     /* A direction changing and length constant ligament for module direction */
     private final MechanismLigament2d[] m_moduleDirections = new MechanismLigament2d[] {
-        m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[1].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+            m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+            m_moduleMechanisms[1].getRoot("RootDirection", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+            m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+            m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
     };
 
     private final double[] m_moduleStatesArray = new double[8];
     private final double[] m_moduleTargetsArray = new double[8];
 
-    /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
+    /**
+     * Accept the swerve drive state and telemeterize it to SmartDashboard and
+     * SignalLogger.
+     */
     public void telemeterizeDriveState(SwerveDriveState state) {
         /* Telemeterize the swerve drive state */
         drivePose.set(state.Pose);
@@ -103,13 +115,13 @@ private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTop
         driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
 
         for (int i = 0; i < 4; ++i) {
-            m_moduleStatesArray[i*2 + 0] = state.ModuleStates[i].angle.getRadians();
-            m_moduleStatesArray[i*2 + 1] = state.ModuleStates[i].speedMetersPerSecond;
-            m_moduleTargetsArray[i*2 + 0] = state.ModuleTargets[i].angle.getRadians();
-            m_moduleTargetsArray[i*2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
+            m_moduleStatesArray[i * 2 + 0] = state.ModuleStates[i].angle.getRadians();
+            m_moduleStatesArray[i * 2 + 1] = state.ModuleStates[i].speedMetersPerSecond;
+            m_moduleTargetsArray[i * 2 + 0] = state.ModuleTargets[i].angle.getRadians();
+            m_moduleTargetsArray[i * 2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
         }
 
-        SignalLogger.writeStruct("DriveState/Pose", Pose2d.struct,state.Pose);
+        SignalLogger.writeStruct("DriveState/Pose", Pose2d.struct, state.Pose);
         SignalLogger.writeDoubleArray("DriveState/ModuleStates", m_moduleStatesArray);
         SignalLogger.writeDoubleArray("DriveState/ModuleTargets", m_moduleTargetsArray);
         SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
@@ -121,25 +133,39 @@ private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTop
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
         }
 
-        LimelightHelpers.PoseEstimate shootCamPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
-        LimelightHelpers.PoseEstimate intakeCamPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-intake");
-        
-        if(shootCamPose.tagCount != 0){
+        /* Telemeterize the pose to a Field2d */
+        double[] m_poseArray = new double[3];
+        m_poseArray[0] = state.Pose.getX();
+        m_poseArray[1] = state.Pose.getY();
+        m_poseArray[2] = state.Pose.getRotation().getDegrees();
+        fieldTypePub.set("Field2d");
+        fieldPub.set(m_poseArray);
+
+        telemeterizeVision();
+    }
+
+    public void telemeterizeVision(){
+         LimelightHelpers.PoseEstimate shootCamPose = LimelightHelpers
+                .getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
+        LimelightHelpers.PoseEstimate intakeCamPose = LimelightHelpers
+                .getBotPoseEstimate_wpiBlue_MegaTag2("limelight-intake");
+
+        if (shootCamPose.tagCount != 0) {
             shootCamPosePub.set(shootCamPose.pose);
             SignalLogger.writeStruct("Vision/shootCamPose", Pose2d.struct, shootCamPose.pose);
         }
 
-        if(intakeCamPose.tagCount != 0){
+        if (intakeCamPose.tagCount != 0) {
             intakeCamPosePub.set(intakeCamPose.pose);
             SignalLogger.writeStruct("Vision/intakeCamPose", Pose2d.struct, intakeCamPose.pose);
         }
 
-
     }
 
-    public void telemeterizeFuelSubsystem(CANFuelSubsystem ballSubsystem){
+    public void telemeterizeFuelSubsystem(CANFuelSubsystem ballSubsystem) {
 
         flywheelTargetPub.set(ballSubsystem.setpointRPS);
         SignalLogger.writeDouble("FuelSubsystem/flywheelTarget", ballSubsystem.setpointRPS);
     }
+
 }
