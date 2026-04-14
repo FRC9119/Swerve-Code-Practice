@@ -27,8 +27,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final TalonFX launcherSecondary;
   private final TalonFX intakeRoller;
   private final CommandSwerveDrivetrain drivetrain;
-  public final  PIDController launchPID;
-  public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
+  public final PIDController launchPID;
+  public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789, 0.11835, 0);
   public final SysIdRoutine sysIdFlywheelRoutine;
   public double setpointRPS = CONSTANT_RPS;
 
@@ -42,12 +42,12 @@ public class CANFuelSubsystem extends SubsystemBase {
 
     feederRoller = new TalonFX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
-    
+
     // Create bang-bang controller
-    launchPID = new PIDController(0.181,0,0);
+    launchPID = new PIDController(0.181, 0, 0);
     // Add tolerance (amount of error that is still considered correct)
     launchPID.setTolerance(LAUNCH_TOLERANCE);
-    
+
     this.setDefaultCommand(constantFlywheel());
     // Add sysId routine to get PID/FF values for flywheel
     sysIdFlywheelRoutine = new SysIdRoutine(
@@ -63,11 +63,13 @@ public class CANFuelSubsystem extends SubsystemBase {
             this));
   }
 
-@Override
-public void periodic(){
-launcherRoller
-        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(),setpointRPS));
-}
+  @Override
+  public void periodic() {
+    launcherRoller
+        .setVoltage(launchFF.calculate(setpointRPS)
+            + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
+
+  }
 
   // A method to set the rollers to values for intaking
   public void intake() {
@@ -98,7 +100,7 @@ launcherRoller
     launchPID.setSetpoint(setpointRPS);
     intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    
+
   }
 
   // A method to stop the rollers
@@ -112,15 +114,17 @@ launcherRoller
   // push Fuel away from the launcher
   public void spinUp() {
     setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
-    
-     launchPID.setSetpoint(setpointRPS);
+
+    launchPID.setSetpoint(setpointRPS);
     launcherRoller
-        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+        .setVoltage(
+            launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
   public void launchWithoutTargeting(double rps) {
     launchPID.setSetpoint(rps);
-    launcherRoller.setVoltage(launchFF.calculate(rps) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+    launcherRoller
+        .setVoltage(launchFF.calculate(rps) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeRoller.setVoltage(-6);
 
@@ -129,23 +133,26 @@ launcherRoller
   // Command factories to turn the spinUp method into a command that requires this
   // subsystem
 
-  public Command constantFlywheel(){
+  public Command constantFlywheel() {
     return this.runOnce(() -> setpointRPS = CONSTANT_RPS);
   }
+
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
 
   public Command intakeWithUnclogCommand() {
-    return Commands.sequence(intakeCommand().withTimeout(1),ejectCommand().withTimeout(.1));
+    return Commands.sequence(intakeCommand().withTimeout(1), ejectCommand().withTimeout(.1));
   }
-  public Command intakeCommand(){
+
+  public Command intakeCommand() {
     return this.run(() -> intake());
   }
 
-public Command ejectCommand(){
-  return this.run(() -> eject());
-}
+  public Command ejectCommand() {
+    return this.run(() -> eject());
+  }
+
   public Command launchCommand() {
     return this.run(() -> launch());
   }

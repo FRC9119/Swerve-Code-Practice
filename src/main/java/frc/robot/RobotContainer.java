@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 import static frc.robot.Constants.DriveConstants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
@@ -16,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -92,7 +92,7 @@ public class RobotContainer {
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
 
                                 .whileTrue(drivetrain.applyRequest(() -> {
-                                        if (USE_SHOOTER_LIMELIGHT) {
+                                        if (SmartDashboard.getBoolean("Use Targeting", true)) {
                                                 if (driverController.cross().getAsBoolean())
                                                         return brake;
                                                 return targetHub.withTargetDirection(
@@ -152,7 +152,8 @@ public class RobotContainer {
                                                                 * speedScalar)
                                                 .withVelocityY(-applyInputShaping(driverController.getRawAxis(0))
                                                                 * speedScalar)
-                                                .withRotationalRate(-applyInputShaping(driverController.getRawAxis(2)) * MaxAngularRate)));
+                                                .withRotationalRate(-applyInputShaping(driverController.getRawAxis(2))
+                                                                * MaxAngularRate)));
 
                 // reset the field-centric heading on left bumper press
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

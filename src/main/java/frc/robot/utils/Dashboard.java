@@ -24,8 +24,8 @@ public class Dashboard {
     SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Default Launch RPS", DEFAULT_LAUNCH_RPS);
-SmartDashboard.putNumber("slope", 9.9);
-SmartDashboard.putNumber("intercept", 30.78);
+    SmartDashboard.putNumber("slope", 9.9);
+    SmartDashboard.putNumber("intercept", 30.78);
 
     SmartDashboard.putNumber("Seconds to wait after center shoot before intaking", 0);
     // Make autoChooser with all autos and add it to dashboard
@@ -40,8 +40,7 @@ SmartDashboard.putNumber("intercept", 30.78);
     autoChooser.addRoutine("Two Cycle (Center to Right)", auto::twoCycleCenterToRight);
     SmartDashboard.putData("auto", autoChooser);
 
-SmartDashboard.putBoolean("Can we win the auto race?", true);
-
+    SmartDashboard.putBoolean("Can we win the auto race?", true);
 
     sysIdRoutineChooser = new SendableChooser<SysIdRoutine>();
     sysIdRoutineChooser.addOption("flywheel", ballSubsystem.sysIdFlywheelRoutine);
@@ -57,6 +56,10 @@ SmartDashboard.putBoolean("Can we win the auto race?", true);
     SmartDashboard.putData("sysId", sysIdRoutineChooser);
 
     SmartDashboard.putData(CommandScheduler.getInstance());
+
+    SmartDashboard.putBoolean("Use Shooter Limelight", true);
+    SmartDashboard.putBoolean("Use Intake Limelight", true);
+    SmartDashboard.putBoolean("Use Targeting", true);
 
   }
 

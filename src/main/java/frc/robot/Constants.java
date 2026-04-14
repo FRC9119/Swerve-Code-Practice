@@ -19,9 +19,8 @@ public final class Constants {
     // Motor controller CAN IDs for Fuel mechanisms
     public static final int INTAKE_MOTOR_ID = 16;
     public static final int FEEDER_MOTOR_ID = 15;
-    public static final int LAUNCHER_MOTOR_ID_1 = 14;    
+    public static final int LAUNCHER_MOTOR_ID_1 = 14;
     public static final int LAUNCHER_MOTOR_ID_2 = 17;
-
 
     // Current limit and nominal voltage for fuel mechanism motors.
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 60;
@@ -34,7 +33,7 @@ public final class Constants {
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 8.8;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
-  
+
     // Only used when no vision
     public static final double DEFAULT_LAUNCH_RPS = 58;
     // Used for the entire match while not shooting
@@ -48,10 +47,9 @@ public final class Constants {
     public static final double SHOOT_AIM_KI = 0;
     public static final double SHOOT_AIM_KD = 0;
 
-    // This number multiplies by the distance between the bot and the hub, and is added to AT_HUB_RPM
+    // This number multiplies by the distance between the bot and the hub, and is
+    // added to AT_HUB_RPM
     public static final double LIMELIGHT_RPM_KP = .01;
-
-    public static final boolean USE_SHOOTER_LIMELIGHT = true;
 
     // Coordinates are in meters from the right corner on the blue alliance side
     public static final double HUB_X_COORD = 4.625594;
@@ -80,9 +78,11 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    // This number is multiplied by joystick input and max speed to get target velocities
+    // This number is multiplied by joystick input and max speed to get target
+    // velocities
     public static final double SPEED_SCALAR = .7;
-    // Same thing, but only applied while the robot is shooting and pointing itself to the hub
+    // Same thing, but only applied while the robot is shooting and pointing itself
+    // to the hub
     public static final double SPEED_SCALAR_WHILE_TARGETING = .5;
   }
 
