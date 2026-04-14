@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Auto;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -54,6 +55,8 @@ SmartDashboard.putBoolean("Can we win the auto race?", true);
     sysIdRoutineChooser.setDefaultOption("nothing", doNothing);
 
     SmartDashboard.putData("sysId", sysIdRoutineChooser);
+
+    SmartDashboard.putData(CommandScheduler.getInstance());
 
   }
 
