@@ -37,7 +37,7 @@ public final class Constants {
     // Only used when no vision
     public static final double DEFAULT_LAUNCH_RPS = 58;
     // Used for the entire match while not shooting
-    public static final double CONSTANT_RPS = 40;
+    public static final double CONSTANT_RPS = 0;
 
     // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = .5;

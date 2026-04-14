@@ -25,7 +25,7 @@ public class Auto {
         private SwerveRequest.FieldCentricFacingAngle targetHubReq = new SwerveRequest.FieldCentricFacingAngle().withHeadingPID(10, 0, 0);
 
 public Command launchSequence(){
-        return Commands.parallel(targetHub().withTimeout(.5),ballSubsystem.spinUpCommand()).andThen(ballSubsystem.launchCommand());
+        return Commands.parallel(targetHub().withTimeout(.5),ballSubsystem.spinUpCommand().until(() -> ballSubsystem.launchPID.atSetpoint())).andThen(ballSubsystem.launchCommand());
 }
 
         public Command targetHub() {

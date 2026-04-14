@@ -33,7 +33,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public final PIDController launchPID;
   public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789, 0.11835, 0);
   public final SysIdRoutine sysIdFlywheelRoutine;
-  public double setpointRPS = CONSTANT_RPS;
+  public double setpointRPS = DEFAULT_LAUNCH_RPS;
 
   private final NetworkTable fuelSubsytemTable = NetworkTableInstance.getDefault().getTable("FuelSubsystem");
   private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
@@ -54,7 +54,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     // Add tolerance (amount of error that is still considered correct)
     launchPID.setTolerance(LAUNCH_TOLERANCE);
 
-    this.setDefaultCommand(constantFlywheel());
     // Add sysId routine to get PID/FF values for flywheel
     sysIdFlywheelRoutine = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -71,10 +70,6 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // shooter wheels always spinning at given setpoint
-    launcherRoller
-        .setVoltage(launchFF.calculate(setpointRPS)
-            + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
     // publish shooter target speed to network tables and write to log file
     flywheelTargetPub.set(setpointRPS);
     SignalLogger.writeDouble("FuelSubsystem/flywheelTarget", setpointRPS);
@@ -104,7 +99,13 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   // A method to set the rollers to values for launching.
-  public void launch() {
+  public void launch(boolean useTargeting) {
+    if (useTargeting)
+      setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
+    launcherRoller
+        .setVoltage(launchFF.calculate(setpointRPS)
+            + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
+
     intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
 
@@ -114,30 +115,26 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void stop() {
     feederRoller.setVoltage(0);
     intakeRoller.setVoltage(0);
+    launcherRoller.setVoltage(0);
   }
 
   // A method to spin up the launcher roller while spinning the feeder roller to
   // push Fuel away from the launcher
   public void spinUp() {
     setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
-
-    launchPID.setSetpoint(setpointRPS);
+    launcherRoller
+        .setVoltage(launchFF.calculate(setpointRPS)
+            + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
     launcherRoller
         .setVoltage(
             launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
-  
-
   // Command factories to turn the spinUp method into a command that requires this
   // subsystem
 
-  public Command constantFlywheel() {
-    return this.runOnce(() -> setpointRPS = CONSTANT_RPS);
-  }
-
   public Command spinUpCommand() {
-    return this.run(() -> spinUp()).finallyDo(this::stop);
+    return this.run(this::spinUp).finallyDo(this::stop);
   }
 
   public Command intakeWithUnclogCommand() {
@@ -145,28 +142,27 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(() -> intake()).alongWith(Commands.run(() -> 
-    setpointRPS = Targeting.getTargetRPS(drivetrain.getPose()))).finallyDo(this::stop);
+    return this.run(this::intake).finallyDo(this::stop);
   }
 
   public Command ejectCommand() {
-    return this.run(() -> eject()).finallyDo(this::stop);
+    return this.run(this::eject).finallyDo(this::stop);
   }
 
   public Command launchCommand() {
-    return this.run(() -> launch()).alongWith(Commands.run(() -> 
-    setpointRPS = Targeting.getTargetRPS(drivetrain.getPose()))).finallyDo(this::stop);
+    return this.run(() -> launch(true)).finallyDo(this::stop);
   }
-  public Command launchWithoutTargeting(double rps){
-    return launchCommand().alongWith(Commands.run(() -> setpointRPS = rps)).finallyDo(this::stop);
+
+  public Command launchWithoutTargeting(double rps) {
+    return this.run(() -> launch(false)).alongWith(Commands.run(() -> setpointRPS = rps)).finallyDo(this::stop);
   }
 
   public Command unclogCommand() {
-    return this.run(() -> unclog()).finallyDo(this::stop);
+    return this.run(this::unclog).finallyDo(this::stop);
   }
 
   public Command stopCommand() {
-    return this.run(() -> stop());
+    return this.run(this::stop);
   }
 
 }
