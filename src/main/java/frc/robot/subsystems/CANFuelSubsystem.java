@@ -115,7 +115,6 @@ public class CANFuelSubsystem extends SubsystemBase {
   // A method to stop the rollers
   public void stop() {
     feederRoller.setVoltage(0);
-    launcherRoller.setVoltage(0);
     intakeRoller.setVoltage(0);
   }
 
@@ -130,14 +129,6 @@ public class CANFuelSubsystem extends SubsystemBase {
             launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
-  public void launchWithoutTargeting(double rps) {
-    launchPID.setSetpoint(rps);
-    launcherRoller
-        .setVoltage(launchFF.calculate(rps) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
-    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    intakeRoller.setVoltage(-6);
-
-  }
 
   // Command factories to turn the spinUp method into a command that requires this
   // subsystem
@@ -147,7 +138,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   public Command spinUpCommand() {
-    return this.run(() -> spinUp());
+    return this.run(() -> spinUp()).finallyDo(this::stop);
   }
 
   public Command intakeWithUnclogCommand() {
@@ -155,19 +146,22 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(() -> intake());
+    return this.run(() -> intake()).finallyDo(this::stop);
   }
 
   public Command ejectCommand() {
-    return this.run(() -> eject());
+    return this.run(() -> eject()).finallyDo(this::stop);
   }
 
   public Command launchCommand() {
-    return this.run(() -> launch());
+    return this.run(() -> launch()).finallyDo(this::stop);
+  }
+  public Command launchWithoutTargeting(double rps){
+    return launchCommand().alongWith(this.run(() -> setpointRPS = rps)).finallyDo(this::stop);
   }
 
   public Command unclogCommand() {
-    return this.run(() -> unclog());
+    return this.run(() -> unclog()).finallyDo(this::stop);
   }
 
   public Command stopCommand() {

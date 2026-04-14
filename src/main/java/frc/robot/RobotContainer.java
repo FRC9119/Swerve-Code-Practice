@@ -118,22 +118,17 @@ public class RobotContainer {
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
                 operatorController.b()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.ejectCommand());
                 // Run intake() periodically while X is pressed
                 operatorController.x()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.intakeCommand());
                 // Run unclog() periodically while X is pressed
                 operatorController.a()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.unclogCommand());
                 operatorController.leftTrigger()
-                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(55));
                 operatorController.rightTrigger()
-                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(operatorController.getRightTriggerAxis() * 30 + 55));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
                 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
