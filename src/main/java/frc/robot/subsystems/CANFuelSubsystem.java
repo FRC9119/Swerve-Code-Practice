@@ -11,6 +11,9 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,6 +34,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789, 0.11835, 0);
   public final SysIdRoutine sysIdFlywheelRoutine;
   public double setpointRPS = CONSTANT_RPS;
+
+  private final NetworkTable fuelSubsytemTable = NetworkTableInstance.getDefault().getTable("FuelSubsystem");
+  private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
@@ -65,10 +71,13 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // shooter wheels always spinning at given setpoint
     launcherRoller
         .setVoltage(launchFF.calculate(setpointRPS)
             + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
-
+    // publish shooter target speed to network tables and write to log file
+    flywheelTargetPub.set(setpointRPS);
+    SignalLogger.writeDouble("FuelSubsystem/flywheelTarget", setpointRPS);
   }
 
   // A method to set the rollers to values for intaking

@@ -28,7 +28,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.utils.Dashboard;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.Targeting;
-import frc.robot.utils.Telemetry;
+import frc.robot.utils.DriveTelemetry;
 
 public class RobotContainer {
         // kSpeedAt12Volts desired top speed
@@ -53,7 +53,7 @@ public class RobotContainer {
         public final SwerveRequest.Idle idle = new SwerveRequest.Idle();
         public final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         // Init logging
-        public final Telemetry logger = new Telemetry(MaxSpeed);
+        public final DriveTelemetry driveLogger = new DriveTelemetry(MaxSpeed);
         // Driver Controller
         private CommandPS5Controller driverController = new CommandPS5Controller(0);
         // Operator Controller
@@ -79,7 +79,7 @@ public class RobotContainer {
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
                 // give logs to drivetrain
-                drivetrain.registerTelemetry(logger::telemeterizeDriveState);
+                drivetrain.registerTelemetry(driveLogger::telemeterizeDriveState);
         }
 
         private void addOperatorBindings() {

@@ -19,9 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.subsystems.CANFuelSubsystem;
 
-public class Telemetry {
+public class DriveTelemetry {
     private final double MaxSpeed;
 
     /**
@@ -29,7 +28,7 @@ public class Telemetry {
      * 
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public DriveTelemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
         SignalLogger.start();
 
@@ -62,14 +61,7 @@ public class Telemetry {
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
-    private final NetworkTable visionTable = inst.getTable("Vision");
-    private final StructPublisher<Pose2d> shootCamPosePub = visionTable.getStructTopic("shootCamPose", Pose2d.struct)
-            .publish();
-    private final StructPublisher<Pose2d> intakeCamPosePub = visionTable.getStructTopic("intakeCamPose", Pose2d.struct)
-            .publish();
-
-    private final NetworkTable fuelSubsytemTable = inst.getTable("FuelSubsystem");
-    private final DoublePublisher flywheelTargetPub = fuelSubsytemTable.getDoubleTopic("flywheelTarget").publish();
+    
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
@@ -141,31 +133,7 @@ public class Telemetry {
         fieldTypePub.set("Field2d");
         fieldPub.set(m_poseArray);
 
-        telemeterizeVision();
     }
 
-    public void telemeterizeVision(){
-         LimelightHelpers.PoseEstimate shootCamPose = LimelightHelpers
-                .getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
-        LimelightHelpers.PoseEstimate intakeCamPose = LimelightHelpers
-                .getBotPoseEstimate_wpiBlue_MegaTag2("limelight-intake");
-
-        if (shootCamPose.tagCount != 0) {
-            shootCamPosePub.set(shootCamPose.pose);
-            SignalLogger.writeStruct("Vision/shootCamPose", Pose2d.struct, shootCamPose.pose);
-        }
-
-        if (intakeCamPose.tagCount != 0) {
-            intakeCamPosePub.set(intakeCamPose.pose);
-            SignalLogger.writeStruct("Vision/intakeCamPose", Pose2d.struct, intakeCamPose.pose);
-        }
-
-    }
-
-    public void telemeterizeFuelSubsystem(CANFuelSubsystem ballSubsystem) {
-
-        flywheelTargetPub.set(ballSubsystem.setpointRPS);
-        SignalLogger.writeDouble("FuelSubsystem/flywheelTarget", ballSubsystem.setpointRPS);
-    }
 
 }
