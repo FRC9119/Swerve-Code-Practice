@@ -30,7 +30,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public final  PIDController launchPID;
   public final SimpleMotorFeedforward launchFF = new SimpleMotorFeedforward(0.14789,0.11835,0);
   public final SysIdRoutine sysIdFlywheelRoutine;
-  public double setpointRPS = DEFAULT_LAUNCH_RPS/60;
+  public double setpointRPS = CONSTANT_RPS;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem(CommandSwerveDrivetrain drivetrain) {
@@ -43,13 +43,12 @@ public class CANFuelSubsystem extends SubsystemBase {
     feederRoller = new TalonFX(FEEDER_MOTOR_ID);
     intakeRoller = new TalonFX(INTAKE_MOTOR_ID);
     
-    // Create bang-bang controller and add a setpoint (goal)
+    // Create bang-bang controller
     launchPID = new PIDController(0.181,0,0);
-    launchPID.setSetpoint(setpointRPS);
     // Add tolerance (amount of error that is still considered correct)
     launchPID.setTolerance(LAUNCH_TOLERANCE);
     
-    
+    this.setDefaultCommand(constantFlywheel());
     // Add sysId routine to get PID/FF values for flywheel
     sysIdFlywheelRoutine = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -63,6 +62,12 @@ public class CANFuelSubsystem extends SubsystemBase {
             null,
             this));
   }
+
+@Override
+public void periodic(){
+launcherRoller
+        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(),setpointRPS));
+}
 
   // A method to set the rollers to values for intaking
   public void intake() {
@@ -93,8 +98,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     launchPID.setSetpoint(setpointRPS);
     intakeRoller.setVoltage(-6);
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    launcherRoller
-        .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+    
   }
 
   // A method to stop the rollers
@@ -114,8 +118,7 @@ public class CANFuelSubsystem extends SubsystemBase {
         .setVoltage(launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
   }
 
-  public void launchWithoutTargeting(double rpm) {
-    double rps = rpm/60;
+  public void launchWithoutTargeting(double rps) {
     launchPID.setSetpoint(rps);
     launcherRoller.setVoltage(launchFF.calculate(rps) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
@@ -125,6 +128,10 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // Command factories to turn the spinUp method into a command that requires this
   // subsystem
+
+  public Command constantFlywheel(){
+    return this.runOnce(() -> setpointRPS = CONSTANT_RPS);
+  }
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
@@ -149,11 +156,6 @@ public Command ejectCommand(){
 
   public Command stopCommand() {
     return this.run(() -> stop());
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 
 }

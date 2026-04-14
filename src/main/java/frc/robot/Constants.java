@@ -35,9 +35,10 @@ public final class Constants {
     public static final double LAUNCHING_FEEDER_VOLTAGE = 8.8;
     public static final double SPIN_UP_FEEDER_VOLTAGE = 0;
   
-    // RPMs for shooter
-    public static final double DEFAULT_LAUNCH_RPS = 3500;
-    public static final double AT_HUB_LAUNCH_RPM = 2500;
+    // Only used when no vision
+    public static final double DEFAULT_LAUNCH_RPS = 58;
+    // Used for the entire match while not shooting
+    public static final double CONSTANT_RPS = 40;
 
     // When shooter is at + or - this RPM, it is considered at its setpoint
     public static final double LAUNCH_TOLERANCE = .5;
