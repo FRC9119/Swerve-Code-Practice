@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.FuelConstants.USE_SHOOTER_LIMELIGHT;
 import static frc.robot.Constants.DriveConstants.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
@@ -16,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,7 +28,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Dashboard;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.Targeting;
-import frc.robot.utils.Telemetry;
+import frc.robot.utils.DriveTelemetry;
 
 public class RobotContainer {
         // kSpeedAt12Volts desired top speed
@@ -53,7 +53,7 @@ public class RobotContainer {
         public final SwerveRequest.Idle idle = new SwerveRequest.Idle();
         public final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         // Init logging
-        public final Telemetry logger = new Telemetry(MaxSpeed);
+        public final DriveTelemetry driveLogger = new DriveTelemetry(MaxSpeed);
         // Driver Controller
         private CommandPS5Controller driverController = new CommandPS5Controller(0);
         // Operator Controller
@@ -79,7 +79,7 @@ public class RobotContainer {
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
                 // give logs to drivetrain
-                drivetrain.registerTelemetry(logger::telemeterizeDriveState);
+                drivetrain.registerTelemetry(driveLogger::telemeterizeDriveState);
         }
 
         private void addOperatorBindings() {
@@ -92,7 +92,7 @@ public class RobotContainer {
                                 .andThen(ballSubsystem.launchCommand()).finallyDo(() -> ballSubsystem.stop()))
 
                                 .whileTrue(drivetrain.applyRequest(() -> {
-                                        if (USE_SHOOTER_LIMELIGHT) {
+                                        if (SmartDashboard.getBoolean("Use Targeting", true)) {
                                                 if (driverController.cross().getAsBoolean())
                                                         return brake;
                                                 return targetHub.withTargetDirection(
@@ -118,22 +118,17 @@ public class RobotContainer {
                                 }));
                 // Run outtake (called eject()) periodically while B is pressed
                 operatorController.b()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.ejectCommand());
                 // Run intake() periodically while X is pressed
                 operatorController.x()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.intakeCommand());
                 // Run unclog() periodically while X is pressed
                 operatorController.a()
-                                .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.unclog(),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.unclogCommand());
                 operatorController.leftTrigger()
-                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(4000),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(55));
                 operatorController.rightTrigger()
-                                .onTrue(ballSubsystem.runEnd(() -> ballSubsystem.launchWithoutTargeting(3000),
-                                                () -> ballSubsystem.stop()));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(operatorController.getRightTriggerAxis() * 30 + 55));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
                 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
@@ -152,7 +147,8 @@ public class RobotContainer {
                                                                 * speedScalar)
                                                 .withVelocityY(-applyInputShaping(driverController.getRawAxis(0))
                                                                 * speedScalar)
-                                                .withRotationalRate(-applyInputShaping(driverController.getRawAxis(2)) * MaxAngularRate)));
+                                                .withRotationalRate(-applyInputShaping(driverController.getRawAxis(2))
+                                                                * MaxAngularRate)));
 
                 // reset the field-centric heading on left bumper press
                 driverController.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
