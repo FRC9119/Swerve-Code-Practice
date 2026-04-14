@@ -37,7 +37,7 @@ public class Targeting {
         ? (new Translation2d(FULL_FIELD_X, FULL_FIELD_Y)).minus(coordinates)
         : coordinates;
     double distance = blueCoordinates.getDistance(new Translation2d(HUB_X_COORD, HUB_Y_COORD));
-    System.out.println(distance);
+      
     //return SmartDashboard.getNumber("Default Launch RPS",0);
     // equation from spreadsheet measurements
     return (SmartDashboard.getNumber("slope", 9.9) * distance + SmartDashboard.getNumber("intercept", 30.78) );
