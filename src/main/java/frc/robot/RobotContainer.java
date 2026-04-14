@@ -26,6 +26,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Dashboard;
+import frc.robot.subsystems.Vision;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.Targeting;
 import frc.robot.utils.DriveTelemetry;
@@ -52,6 +53,7 @@ public class RobotContainer {
         // neutral mode is applied to the drive motors while disabled.
         public final SwerveRequest.Idle idle = new SwerveRequest.Idle();
         public final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+       
         // Init logging
         public final DriveTelemetry driveLogger = new DriveTelemetry(MaxSpeed);
         // Driver Controller
@@ -61,6 +63,9 @@ public class RobotContainer {
         // Init Subsystems
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
         public final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem(drivetrain);
+        public final Vision vison = new Vision(drivetrain);
+        
+
         // Init auto
         public final Auto auto = new Auto(drivetrain, ballSubsystem);
 
