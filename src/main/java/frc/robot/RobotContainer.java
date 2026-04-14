@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.utils.Dashboard;
+import frc.robot.subsystems.Dashboard;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.Targeting;
 import frc.robot.utils.Telemetry;

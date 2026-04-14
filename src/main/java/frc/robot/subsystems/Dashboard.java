@@ -1,19 +1,21 @@
-package frc.robot.utils;
+package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Auto;
-import frc.robot.subsystems.CANFuelSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.utils.ShiftTimer;
 
 import static frc.robot.Constants.ClimbConstants.*;
 import static frc.robot.Constants.FuelConstants.*;
 import choreo.auto.AutoChooser;
 
-public class Dashboard {
+public class Dashboard extends SubsystemBase {
   public AutoChooser autoChooser;
   public SendableChooser<SysIdRoutine> sysIdRoutineChooser;
+
+  public ShiftTimer shiftTimer = new ShiftTimer();
 
   public Dashboard(Auto auto, CANFuelSubsystem ballSubsystem, CommandSwerveDrivetrain drivetrain) {
     // Put a bunch of constants onto the dashboard
@@ -23,8 +25,8 @@ public class Dashboard {
     SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Default Launch RPS", DEFAULT_LAUNCH_RPS);
-SmartDashboard.putNumber("slope", 9.9);
-SmartDashboard.putNumber("intercept", 30.78);
+    SmartDashboard.putNumber("slope", 9.9);
+    SmartDashboard.putNumber("intercept", 30.78);
 
     SmartDashboard.putNumber("Seconds to wait after center shoot before intaking", 0);
     // Make autoChooser with all autos and add it to dashboard
@@ -39,8 +41,7 @@ SmartDashboard.putNumber("intercept", 30.78);
     autoChooser.addRoutine("Two Cycle (Center to Right)", auto::twoCycleCenterToRight);
     SmartDashboard.putData("auto", autoChooser);
 
-SmartDashboard.putBoolean("Can we win the auto race?", true);
-
+    SmartDashboard.putBoolean("Can we win the auto race?", true);
 
     sysIdRoutineChooser = new SendableChooser<SysIdRoutine>();
     sysIdRoutineChooser.addOption("flywheel", ballSubsystem.sysIdFlywheelRoutine);
@@ -55,6 +56,11 @@ SmartDashboard.putBoolean("Can we win the auto race?", true);
 
     SmartDashboard.putData("sysId", sysIdRoutineChooser);
 
+  }
+
+  @Override
+  public void periodic() {
+    shiftTimer.updateTimer();
   }
 
 }
