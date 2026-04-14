@@ -44,15 +44,16 @@ public class Vision extends SubsystemBase {
             LimelightHelpers.PoseEstimate shootCamEstimate = LimelightHelpers
                     .getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shoot");
 
-            if (intakeCamEstimate.tagCount != 0 && SmartDashboard.getBoolean("Use Intake Limelight", true)) {
-                drivetrain.addVisionMeasurement(useGyroRotation(intakeCamEstimate.pose), Timer.getFPGATimestamp());
+            if (shootCamEstimate.tagCount != 0 && SmartDashboard.getBoolean("Use Shooter Limelight", true)) {
+                drivetrain.addVisionMeasurement(useGyroRotation(shootCamEstimate.pose), Timer.getFPGATimestamp());
 
                 shootCamPosePub.set(shootCamEstimate.pose);
                 SignalLogger.writeStruct("Vision/shootCamPose", Pose2d.struct, shootCamEstimate.pose);
             }
 
-            if (shootCamEstimate.tagCount != 0 && SmartDashboard.getBoolean("Use Shooter Limelight", true)) {
-                drivetrain.addVisionMeasurement(useGyroRotation(shootCamEstimate.pose), Timer.getFPGATimestamp());
+            if (intakeCamEstimate.tagCount != 0 && SmartDashboard.getBoolean("Use Intake Limelight", true)) {
+                System.out.println(intakeCamEstimate.pose);
+                drivetrain.addVisionMeasurement(useGyroRotation(intakeCamEstimate.pose), Timer.getFPGATimestamp());
 
                 intakeCamPosePub.set(intakeCamEstimate.pose);
                 SignalLogger.writeStruct("Vision/intakeCamPose", Pose2d.struct, intakeCamEstimate.pose);

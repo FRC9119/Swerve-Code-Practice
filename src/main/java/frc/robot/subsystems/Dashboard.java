@@ -55,6 +55,9 @@ public class Dashboard extends SubsystemBase {
     sysIdRoutineChooser.setDefaultOption("nothing", doNothing);
 
     SmartDashboard.putData("sysId", sysIdRoutineChooser);
+SmartDashboard.putBoolean("Use Shooter Limelight", true);
+SmartDashboard.putBoolean("Use Intake Limelight", true);
+
 
   }
 
