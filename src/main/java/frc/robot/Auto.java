@@ -96,7 +96,7 @@ public Command launchSequence(){
                                                 cycle1Traj.resetOdometry(),
                                                 cycle1Traj.cmd()));
 
-                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL).andThen(cycle2Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_ALL).andThen(cycle2Traj.cmd().asProxy()));
                 cycle2Traj.done().onTrue(launchSequence());
                 return routine;
 
@@ -141,7 +141,7 @@ public Command launchSequence(){
                                 Commands.sequence(
                                                 cycle1Traj.resetOdometry(),
                                                 cycle1Traj.cmd()));
-                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd().asProxy()));
                 
                 cycle2Traj.done().onTrue(launchSequence());
 
@@ -157,7 +157,7 @@ public Command launchSequence(){
                                 Commands.sequence(
                                                 cycle1Traj.resetOdometry(),
                                                 cycle1Traj.cmd()));
-                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd().asProxy()));
                 
                 cycle2Traj.done().onTrue(launchSequence());
 
