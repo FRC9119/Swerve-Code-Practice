@@ -130,10 +130,8 @@ public class RobotContainer {
                 // Run unclog() periodically while X is pressed
                 operatorController.a()
                                 .whileTrue(ballSubsystem.unclogCommand());
-                operatorController.leftTrigger()
-                                .whileTrue(ballSubsystem.launchWithoutTargeting(55));
                 operatorController.rightTrigger()
-                                .whileTrue(ballSubsystem.launchWithoutTargeting(operatorController.getRightTriggerAxis() * 30 + 55));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(operatorController.getRightY() * 20 + 65));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
                 operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
