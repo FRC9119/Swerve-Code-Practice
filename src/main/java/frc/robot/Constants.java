@@ -57,7 +57,7 @@ public final class Constants {
     public static final double FULL_FIELD_X = 16.5409;
     public static final double FULL_FIELD_Y = 8.0693;
     // how many seconds does it take to launch eight fuel (used for auto)
-    public static final double TIME_TO_LAUNCH_8 = 3;
+    public static final double TIME_TO_LAUNCH_8 = 2;
     public static final double TIME_TO_LAUNCH_ALL = 5;
 
   }
