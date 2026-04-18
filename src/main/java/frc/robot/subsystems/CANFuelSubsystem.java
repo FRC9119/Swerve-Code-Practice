@@ -77,14 +77,14 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // A method to set the rollers to values for intaking
   public void intake() {
-    feederRoller.setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
+    feederRoller.setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
+        .setVoltage(-SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
   // Method to unclog the shooter just in case a fuel is stuck
   public void unclog() {
-    feederRoller.setVoltage(-6);
+    feederRoller.setVoltage(6);
     intakeRoller
         .setVoltage(8);
   }
@@ -93,7 +93,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   // the same values as intaking, but in the opposite direction.
   public void eject() {
     feederRoller
-        .setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
+        .setVoltage(-SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeRoller
         .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
   }
@@ -107,7 +107,7 @@ public class CANFuelSubsystem extends SubsystemBase {
             + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
 
     intakeRoller.setVoltage(-6);
-    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
+    feederRoller.setVoltage(-SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
 
   }
 
@@ -123,11 +123,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void spinUp() {
     setpointRPS = Targeting.getTargetRPS(drivetrain.getPose());
     launcherRoller
-        .setVoltage(launchFF.calculate(setpointRPS)
-            + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
-    launcherRoller
         .setVoltage(
-            launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble()));
+            launchFF.calculate(setpointRPS) + launchPID.calculate(launcherRoller.getVelocity().getValueAsDouble(), setpointRPS));
   }
 
   // Command factories to turn the spinUp method into a command that requires this
