@@ -131,10 +131,10 @@ public class RobotContainer {
                 operatorController.a()
                                 .whileTrue(ballSubsystem.unclogCommand());
                 operatorController.rightTrigger()
-                                .whileTrue(ballSubsystem.launchWithoutTargeting(-operatorController.getRightY() * 20 + 65));
+                                .whileTrue(ballSubsystem.launchWithoutTargeting(-operatorController.getRightY() * 40 + 80));
                 // Start and end SysId logging
                 operatorController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-                operatorController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+                operatorController.button(6).onTrue(Commands.runOnce(SignalLogger::stop));
         }
 
         private void addDriverBindings() {

@@ -141,7 +141,7 @@ public Command launchSequence(){
                                 Commands.sequence(
                                                 cycle1Traj.resetOdometry(),
                                                 cycle1Traj.cmd()));
-                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd().asProxy()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8 + SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0)).andThen(cycle2Traj.cmd().asProxy()));
                 
                 cycle2Traj.done().onTrue(launchSequence());
 
@@ -157,7 +157,7 @@ public Command launchSequence(){
                                 Commands.sequence(
                                                 cycle1Traj.resetOdometry(),
                                                 cycle1Traj.cmd()));
-                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8).andThen(cycle2Traj.cmd().asProxy()));
+                cycle1Traj.done().onTrue(launchSequence().withTimeout(TIME_TO_LAUNCH_8 + SmartDashboard.getNumber("Seconds to wait after center shoot before intaking", 0)).andThen(cycle2Traj.cmd().asProxy()));
                 
                 cycle2Traj.done().onTrue(launchSequence());
 
